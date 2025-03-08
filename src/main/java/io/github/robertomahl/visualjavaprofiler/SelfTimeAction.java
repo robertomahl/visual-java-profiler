@@ -32,8 +32,10 @@ import org.jetbrains.annotations.NotNull;
 public class SelfTimeAction extends AnAction {
 
     //TODO: consider finding approach that does no require the action to be run first: "Use Startup Activity if it should always run when the project opens"?
-    //TODO: once the action is performed, also execute for already open files
+    //TODO: once the action is performed, also execute for already opened files
     //TODO: should I stop the highlighting if the method's been changed since the profiling execution?
+
+    //TODO: add start/stop logic for actions
 
     private static final String TARGET_METHOD_SIGNATURE = "com.minguard.service.impl.StatusServiceImpl.findAll()";
 
@@ -119,6 +121,7 @@ public class SelfTimeAction extends AnAction {
         Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
         if (editor == null) return;
 
+        //TODO: improve highlighting so it is applied to all text within the method
         MarkupModel markupModel = editor.getMarkupModel();
         TextAttributes attributes = new TextAttributes(Color.RED, null, null, EffectType.LINE_UNDERSCORE, Font.BOLD);
 
