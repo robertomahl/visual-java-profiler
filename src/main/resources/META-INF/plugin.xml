@@ -12,12 +12,11 @@
 
     <actions>
         <action id="io.github.robertomahl.visualjavaprofiler.SelfTimeActionToolsMenu"
-                class="io.github.robertomahl.visualjavaprofiler.SelfTimeAction" text="Self Time Metric Action"
-                description="Method execution time excluding submethods execution time">
+                class="io.github.robertomahl.visualjavaprofiler.SelfTimeAction"
+                text="Self Time Metric"
+                description="Method execution time excluding sub-methods execution time">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
-            <override-text
-                    place="EditorPopup"
-                    use-text-of-place="MainMenu"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>
 
