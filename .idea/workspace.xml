@@ -7,7 +7,6 @@
     <list default="true" id="baa778e1-8057-49f4-84fb-4fcd17f5fbb0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/SelfTimeAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/SelfTimeAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/META-INF/plugin.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,6 +51,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Action" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -252,7 +252,8 @@
       <workItem from="1740866368630" duration="18775000" />
       <workItem from="1741127453306" duration="6006000" />
       <workItem from="1741192589093" duration="626000" />
-      <workItem from="1741444753947" duration="12671000" />
+      <workItem from="1741444753947" duration="20782000" />
+      <workItem from="1741544502812" duration="7168000" />
     </task>
     <servers />
   </component>
