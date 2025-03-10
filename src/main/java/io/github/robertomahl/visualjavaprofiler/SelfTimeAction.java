@@ -32,16 +32,17 @@ public class SelfTimeAction extends AnAction {
 
     //Essentials
     //TODO: integrate with profiling output
-    //TODO: add start/stop logic for the highlighting
     //TODO: implement scale of colors to differ execution time
-    //TODO: think of UX -- best menu to keep actions? create window?
+    //TODO: add start/stop logic for the highlighting
 
-    //Ideas
+    //Improvements
     //TODO: stop the highlighting if the method's been changed since the profiling execution
+    //TODO: think of UX -- best menu to keep actions? create window?
     //TODO: also include the actual execution time in a label, besides color highlighting
 
     //Extras
-    //TODO: add option to only highlight x% most time-consuming methods
+    //TODO: store profiling data for historic visualization of results -- action for selecting visualization version
+    //TODO: add option to only highlight x% most time-consuming methods - configurable
     //TODO: highlighting most time-consuming files in the project files view as well
 
     private static final String TARGET_METHOD_SIGNATURE = "com.minguard.service.impl.StatusServiceImpl.findAll()";
