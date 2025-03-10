@@ -30,10 +30,19 @@ import org.jetbrains.annotations.NotNull;
 
 public class SelfTimeAction extends AnAction {
 
-    //TODO: stop the highlighting if the method's been changed since the profiling execution?
-    //TODO: add start/stop logic for the action
+    //Essentials
+    //TODO: integrate with profiling output
+    //TODO: add start/stop logic for the highlighting
+    //TODO: implement scale of colors to differ execution time
+    //TODO: think of UX -- best menu to keep actions? create window?
 
-    //TODO: consider finding approach that does no require the action to be run first: "Use Startup Activity if it should always run when the project opens"?
+    //Ideas
+    //TODO: stop the highlighting if the method's been changed since the profiling execution
+    //TODO: also include the actual execution time in a label, besides color highlighting
+
+    //Extras
+    //TODO: add option to only highlight x% most time-consuming methods
+    //TODO: highlighting most time-consuming files in the project files view as well
 
     private static final String TARGET_METHOD_SIGNATURE = "com.minguard.service.impl.StatusServiceImpl.findAll()";
 
