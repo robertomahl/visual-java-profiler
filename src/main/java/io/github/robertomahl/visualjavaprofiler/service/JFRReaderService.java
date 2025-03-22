@@ -18,6 +18,7 @@ public class JFRReaderService {
 
     private static final Consumer<RecordedEvent> methodRunCountAction = JFRReaderService::computeMethodRunCount;
     private static final Consumer<RecordedEvent> methodExecutionTimeAction = JFRReaderService::computeMethodExecutionTime;
+    //TODO: add avg execution time
 
     private static final String EXECUTION_SAMPLE_EVENT = "jdk.ExecutionSample";
 
@@ -41,6 +42,22 @@ public class JFRReaderService {
             throw new IllegalArgumentException("Profiling result path is not set");
         }
         read(profilingResultPath);
+    }
+
+    public static synchronized boolean isProfilingResultPathSet() {
+        return profilingResultPath != null;
+    }
+
+    public static synchronized Map<String, Long> getProfilingResults() {
+        return profilingResults;
+    }
+
+    public static synchronized void setProfilingMetric(ProfilingMetric profilingMetric) {
+        JFRReaderService.profilingMetric = profilingMetric;
+    }
+
+    public static synchronized void setProfilingResultPath(Path profilingResultPath) {
+        JFRReaderService.profilingResultPath = profilingResultPath;
     }
 
     private static void read(Path path) {
@@ -87,21 +104,4 @@ public class JFRReaderService {
     private static String getMethodSignature(RecordedFrame frame) {
         return frame.getMethod().getType().getName() + "." + frame.getMethod().getName();
     }
-
-    public static Map<String, Long> getProfilingResults() {
-        return profilingResults;
-    }
-
-    public static synchronized boolean isProfilingResultPathSet() {
-        return profilingResultPath != null;
-    }
-
-    public static synchronized void setProfilingMetric(ProfilingMetric profilingMetric) {
-        JFRReaderService.profilingMetric = profilingMetric;
-    }
-
-    public static synchronized void setProfilingResultPath(Path profilingResultPath) {
-        JFRReaderService.profilingResultPath = profilingResultPath;
-    }
-
 }

@@ -116,6 +116,7 @@ public class ToggleVisualizationAction extends AnAction {
     private void highlightTargetMethod(PsiJavaFile psiFile, Project project, List<Editor> editors) {
         for (PsiMethod method : PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class)) {
             String methodSignature = getMethodSignature(method);
+            //TODO: apply to JFR results
             if (TARGET_METHOD_SIGNATURE.equals(methodSignature)) {
                 editors.forEach(editor -> highlightMethod(project, method, editor));
             }
