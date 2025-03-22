@@ -1,4 +1,4 @@
-package io.github.robertomahl.visualjavaprofiler;
+package io.github.robertomahl.visualjavaprofiler.sample;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.EffectType;

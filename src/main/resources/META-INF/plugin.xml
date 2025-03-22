@@ -5,28 +5,45 @@
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>Visual Java Profiler</name>
+    <name>Profiler Lens</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="robertomahl@live.com" url="https://github.com/robertomahl">Roberto Mahl</vendor>
 
     <actions>
-        <action id="io.github.robertomahl.visualjavaprofiler.SelfTimeActionToolsMenu"
-                class="io.github.robertomahl.visualjavaprofiler.SelfTimeAction"
-                text="Self Time Metric"
-                description="Method execution time excluding sub-methods execution time">
+        <group id="io.github.robertomahl.visualjavaprofiler.ProfilerLensGroup"
+               text="Profiler Lens" popup="true">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
-        </action>
+
+            <action id="io.github.robertomahl.visualjavaprofiler.ProfilerLensToggleVisualization"
+                    class="io.github.robertomahl.visualjavaprofiler.action.ToggleVisualizationAction"
+                    text="Toggle Visualization"
+                    description="Enable or disable profiler visualization">
+            </action>
+
+            <action id="io.github.robertomahl.visualjavaprofiler.ProfilerLensSelectProfilingResult"
+                    class="io.github.robertomahl.visualjavaprofiler.action.SelectProfilingResultAction"
+                    text="Select Profiling Result"
+                    description="Choose a specific profiling result for analysis">
+            </action>
+
+            <action id="io.github.robertomahl.visualjavaprofiler.ProfilerLensSelectMetric"
+                    class="io.github.robertomahl.visualjavaprofiler.action.SelectMetricAction"
+                    text="Select Metric"
+                    description="Select a performance metric for visualization">
+            </action>
+        </group>
     </actions>
+
 
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description>
-        Integrate VisualVM profiler with IntelliJ IDEA to profile your Java applications.
+        Integrate profiler results to your Java codebase in Intellij IDEA.
         - See the profiling results within your codebase.
-        - Keep track of the source code lines that are causing performance issues.
+        - Keep track of the source-code lines that are causing performance issues.
     </description>
 
     <!-- Product and plugin compatibility requirements.

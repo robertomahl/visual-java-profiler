@@ -1,4 +1,4 @@
-package io.github.robertomahl.visualjavaprofiler;
+package io.github.robertomahl.visualjavaprofiler.sample;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;

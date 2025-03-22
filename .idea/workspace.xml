@@ -6,7 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="baa778e1-8057-49f4-84fb-4fcd17f5fbb0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/SelfTimeAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/SelfTimeAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/ExampleActions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/sample/ExampleActions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/ExampleMarkups.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/sample/ExampleMarkups.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/SelfTimeAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/ToggleVisualizationAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/META-INF/plugin.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,42 +76,57 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Gradle.Run Plugin.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.visual-java-profiler [buildDependents].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.visual-java-profiler [buildEnvironment].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.visual-java-profiler [buildNeeded].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.visual-java-profiler [buildPlugin].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.visual-java-profiler [build].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.visual-java-profiler [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.visual-java-profiler [dependencies].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.visual-java-profiler [init].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.visual-java-profiler [setupDependencies].executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/idealogic/Documentos/Pessoal/minguard-be&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;profiler.jvm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Gradle.Run Plugin.executor": "Run",
+    "Gradle.visual-java-profiler [:io.github.robertomahl.visualjavaprofiler.service.JFRAnalyzerService.main()].executor": "Run",
+    "Gradle.visual-java-profiler [buildDependents].executor": "Run",
+    "Gradle.visual-java-profiler [buildEnvironment].executor": "Run",
+    "Gradle.visual-java-profiler [buildNeeded].executor": "Run",
+    "Gradle.visual-java-profiler [buildPlugin].executor": "Run",
+    "Gradle.visual-java-profiler [build].executor": "Run",
+    "Gradle.visual-java-profiler [clean].executor": "Run",
+    "Gradle.visual-java-profiler [dependencies].executor": "Run",
+    "Gradle.visual-java-profiler [init].executor": "Run",
+    "Gradle.visual-java-profiler [setupDependencies].executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/idealogic/Documentos/Pessoal/minguard-be",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "profiler.jvm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/java" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="io.github.robertomahl.visualjavaprofiler.action" />
       <recent name="io.github.robertomahl.visualjavaprofiler" />
     </key>
   </component>
   <component name="RunManager" selected="Gradle.Run Plugin">
+    <configuration name="JFRReaderService" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="io.github.robertomahl.visualjavaprofiler.service.JFRReaderService" />
+      <module name="visual-java-profiler.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.github.robertomahl.visualjavaprofiler.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="visual-java-profiler [buildEnvironment]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -121,28 +139,6 @@
         <option name="taskNames">
           <list>
             <option value="buildEnvironment" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>false</RunAsTest>
-      <method v="2" />
-    </configuration>
-    <configuration name="visual-java-profiler [buildPlugin]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="buildPlugin" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -222,10 +218,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.visual-java-profiler [clean]" />
+        <item itemvalue="Application.JFRReaderService" />
         <item itemvalue="Gradle.visual-java-profiler [init]" />
         <item itemvalue="Gradle.visual-java-profiler [dependencies]" />
         <item itemvalue="Gradle.visual-java-profiler [buildEnvironment]" />
-        <item itemvalue="Gradle.visual-java-profiler [buildPlugin]" />
       </list>
     </recent_temporary>
   </component>
@@ -256,6 +252,13 @@
       <workItem from="1741544502812" duration="8843000" />
       <workItem from="1741606319971" duration="10000" />
       <workItem from="1741637339416" duration="1066000" />
+      <workItem from="1741639311796" duration="224000" />
+      <workItem from="1741697762147" duration="6000" />
+      <workItem from="1742059201280" duration="2026000" />
+      <workItem from="1742218125044" duration="585000" />
+      <workItem from="1742342641100" duration="3109000" />
+      <workItem from="1742384477621" duration="3000" />
+      <workItem from="1742650742937" duration="3137000" />
     </task>
     <servers />
   </component>
