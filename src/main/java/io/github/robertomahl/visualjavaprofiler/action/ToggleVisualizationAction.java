@@ -37,20 +37,11 @@ public class ToggleVisualizationAction extends AnAction {
     //TODO: implement scale of colors to differ execution time
     //TODO: add start/stop logic for the highlighting
 
-    /*
-        1. Profiler Lens
-            1.1. Toggle Visualization
-            1.2. Select Profiling Result
-            1.3. Select Metric
-     */
-
     //Improvements
     //TODO: stop the highlighting if the method's been changed since the profiling execution
-    //TODO: think of UX -- best menu to keep actions? create window?
     //TODO: also include the actual execution time in a label, besides color highlighting
 
     //Extras
-    //TODO: store profiling data for historic visualization of results -- action for selecting visualization version
     //TODO: add option to only highlight x% most time-consuming methods - configurable
     //TODO: highlighting most time-consuming files in the project files view as well
 
@@ -74,7 +65,7 @@ public class ToggleVisualizationAction extends AnAction {
     public void actionPerformed(AnActionEvent anActionEvent) {
         final var project = Optional.ofNullable(anActionEvent.getProject()).orElseThrow();
 
-        if (JFRReaderService.profilingResults == null)
+        if (JFRReaderService.getProfilingResults() == null)
             new SelectProfilingResultAction().actionPerformed(anActionEvent);
 
         registerFileOpenListener(project);

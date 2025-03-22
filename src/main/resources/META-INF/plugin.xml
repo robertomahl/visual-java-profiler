@@ -29,8 +29,8 @@
             </action>
 
             <action id="io.github.robertomahl.visualjavaprofiler.ProfilerLensSelectMetric"
-                    class="io.github.robertomahl.visualjavaprofiler.action.SelectMetricAction"
-                    text="Select Metric"
+                    class="io.github.robertomahl.visualjavaprofiler.action.SelectProfilingMetricAction"
+                    text="Select Profiling Metric"
                     description="Select a performance metric for visualization">
             </action>
         </group>
