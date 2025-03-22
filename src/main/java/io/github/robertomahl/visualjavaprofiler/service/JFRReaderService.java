@@ -10,9 +10,11 @@ import jdk.jfr.consumer.RecordingFile;
 
 public class JFRReaderService {
 
+    public static Map<String, Long> profilingResults = null;
+
     private static final String EXECUTION_SAMPLE_EVENT = "jdk.ExecutionSample";
 
-    public Map<String, Long> readMethodMetrics(Path path) {
+    public static void readProfilingResults(Path path) {
         Map<String, Long> methodMetrics = new HashMap<>();
 
         try (RecordingFile recording = new RecordingFile(path)) {
@@ -30,7 +32,8 @@ public class JFRReaderService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return methodMetrics;
+
+        profilingResults = methodMetrics;
     }
 
 }

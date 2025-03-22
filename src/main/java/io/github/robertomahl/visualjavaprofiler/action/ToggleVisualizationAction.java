@@ -23,6 +23,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.messages.MessageBusConnection;
+import io.github.robertomahl.visualjavaprofiler.service.JFRReaderService;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.List;
@@ -72,6 +73,9 @@ public class ToggleVisualizationAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {
         final var project = Optional.ofNullable(anActionEvent.getProject()).orElseThrow();
+
+        if (JFRReaderService.profilingResults == null)
+            new SelectProfilingResultAction().actionPerformed(anActionEvent);
 
         registerFileOpenListener(project);
         applyToAllOpenFiles(project);
