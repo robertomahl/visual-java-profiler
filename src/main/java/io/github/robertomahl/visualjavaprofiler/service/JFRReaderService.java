@@ -13,7 +13,7 @@ import jdk.jfr.consumer.RecordingFile;
 
 public class JFRReaderService {
 
-    private static ProfilingMetric profilingMetric = ProfilingMetric.METHOD_EXECUTION_TIME;
+    private static ProfilingMetric profilingMetric = ProfilingMetric.METHOD_RUN_COUNT;
     private static Path profilingResultPath = null;
     private static Map<String, Long> profilingResults = null;
 
@@ -21,8 +21,7 @@ public class JFRReaderService {
 
     public enum ProfilingMetric {
         METHOD_RUN_COUNT(JFRReaderService::computeMethodRunCount),
-        METHOD_EXECUTION_TIME(JFRReaderService::computeMethodExecutionTime);
-        //TODO: add avg execution time
+        ;
 
         ProfilingMetric(Consumer<RecordedEvent> action) {
             this.action = action;
@@ -83,22 +82,6 @@ public class JFRReaderService {
                 .map(JFRReaderService::getMethodSignature)
                 .forEach(methodSignature ->
                         profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
-    }
-
-    private static void computeMethodExecutionTime(RecordedEvent event) {
-        RecordedStackTrace stackTrace = event.getStackTrace();
-        if (stackTrace == null) {
-            return;
-        }
-        if (!event.hasField("duration")) {
-            throw new IllegalArgumentException("Event does not have a duration field");
-        }
-
-        stackTrace.getFrames().stream()
-                .map(RecordedFrame::getMethod)
-                .map(JFRReaderService::getMethodSignature)
-                .forEach(methodSignature ->
-                        profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + event.getLong("duration")));
     }
 
     //TODO: Add method params to include overloads distinction
