@@ -1,7 +1,6 @@
 package io.github.robertomahl.visualjavaprofiler.service;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -14,7 +13,7 @@ import jdk.jfr.consumer.RecordingFile;
 public class JFRReaderService {
 
     private static ProfilingMetric profilingMetric = ProfilingMetric.METHOD_RUN_COUNT;
-    private static Path profilingResultPath = null;
+    private static RecordingFile recordingFile = null;
     private static Map<String, Long> profilingResults = null;
 
     private static final String EXECUTION_SAMPLE_EVENT = "jdk.ExecutionSample";
@@ -34,15 +33,8 @@ public class JFRReaderService {
         }
     }
 
-    public static void read() {
-        if (!JFRReaderService.isProfilingResultPathSet()) {
-            throw new IllegalArgumentException("Profiling result path is not set");
-        }
-        read(profilingResultPath);
-    }
-
-    public static synchronized boolean isProfilingResultPathSet() {
-        return profilingResultPath != null;
+    public static synchronized boolean isNotRecordingFileSet() {
+        return recordingFile == null;
     }
 
     public static synchronized Map<String, Long> getProfilingResults() {
@@ -53,22 +45,25 @@ public class JFRReaderService {
         JFRReaderService.profilingMetric = profilingMetric;
     }
 
-    public static synchronized void setProfilingResultPath(Path profilingResultPath) {
-        JFRReaderService.profilingResultPath = profilingResultPath;
+    public static synchronized void setRecordingFile(RecordingFile recordingFile) {
+        JFRReaderService.recordingFile = recordingFile;
     }
 
-    private static void read(Path path) {
+    public static void read() {
+        if (JFRReaderService.isNotRecordingFileSet())
+            throw new IllegalArgumentException("Profiling result path is not set");
+
         profilingResults = new ConcurrentHashMap<>();
 
-        try (RecordingFile recording = new RecordingFile(path)) {
-            while (recording.hasMoreEvents()) {
-                RecordedEvent event = recording.readEvent();
+        while (recordingFile.hasMoreEvents()) {
+            try {
+                RecordedEvent event = recordingFile.readEvent();
                 if (EXECUTION_SAMPLE_EVENT.equals(event.getEventType().getName())) {
                     profilingMetric.getAction().accept(event);
                 }
+            } catch (IOException ex) {
+                throw new RuntimeException("Error reading JFR file", ex);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 

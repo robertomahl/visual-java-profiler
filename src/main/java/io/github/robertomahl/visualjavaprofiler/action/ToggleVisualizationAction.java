@@ -64,7 +64,7 @@ public class ToggleVisualizationAction extends AnAction {
     public void actionPerformed(AnActionEvent anActionEvent) {
         final var project = Optional.ofNullable(anActionEvent.getProject()).orElseThrow();
 
-        if (JFRReaderService.getProfilingResults() == null)
+        if (JFRReaderService.isNotRecordingFileSet())
             new SelectProfilingResultAction().actionPerformed(anActionEvent);
 
         registerFileOpenListener(project);
