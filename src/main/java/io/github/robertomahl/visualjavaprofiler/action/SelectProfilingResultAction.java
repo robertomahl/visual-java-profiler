@@ -48,6 +48,10 @@ public class SelectProfilingResultAction extends AnAction {
             try (RecordingFile recording = new RecordingFile(Path.of(file.getPath()))) {
                 JFRReaderService.setRecordingFile(recording);
                 JFRReaderService.read();
+
+                final var toggleVisualizationAction = new ToggleVisualizationAction();
+                toggleVisualizationAction.removeFromAllOpenFiles(project);
+                toggleVisualizationAction.applyToAllOpenFiles(project);
             } catch (IOException ex) {
                 Messages.showErrorDialog(project, "Invalid file. Please select a valid JFR file.", "Error");
             }

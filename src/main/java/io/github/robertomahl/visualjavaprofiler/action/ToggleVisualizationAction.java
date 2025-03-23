@@ -34,17 +34,20 @@ public class ToggleVisualizationAction extends AnAction {
     //Profiler Lens
 
     //Essentials
-    //TODO: integrate with profiling output
     //TODO: implement scale of colors to differ execution time
-    //TODO: add start/stop logic for the highlighting
 
     //Improvements
     //TODO: stop the highlighting if the method's been changed since the profiling execution
     //TODO: also include the actual execution time in a label, besides color highlighting
 
     //Extras
+    //TODO: add new metrics
     //TODO: add option to only highlight x% most time-consuming methods - configurable
     //TODO: highlighting most time-consuming files in the project files view as well
+
+    private static boolean isVisible = false;
+
+    private static MessageBusConnection connection = null;
 
     @Override
     public void update(AnActionEvent e) {
@@ -64,15 +67,24 @@ public class ToggleVisualizationAction extends AnAction {
     public void actionPerformed(AnActionEvent anActionEvent) {
         final var project = Optional.ofNullable(anActionEvent.getProject()).orElseThrow();
 
-        if (JFRReaderService.isNotRecordingFileSet())
-            new SelectProfilingResultAction().actionPerformed(anActionEvent);
+        if (isVisible) {
+            unregisterFileOpenListener();
+            removeFromAllOpenFiles(project);
+        } else {
+            if (JFRReaderService.isNotRecordingFileSet())
+                new SelectProfilingResultAction().actionPerformed(anActionEvent);
 
-        registerFileOpenListener(project);
-        applyToAllOpenFiles(project);
+            registerFileOpenListener(project);
+            applyToAllOpenFiles(project);
+        }
+        isVisible = !isVisible;
     }
 
     private void registerFileOpenListener(Project project) {
-        MessageBusConnection connection = project.getMessageBus().connect();
+        if (connection != null)
+            return;
+
+        connection = project.getMessageBus().connect();
         connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
             @Override
             public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
@@ -84,7 +96,7 @@ public class ToggleVisualizationAction extends AnAction {
         });
     }
 
-    private void applyToAllOpenFiles(Project project) {
+    public void applyToAllOpenFiles(Project project) {
         FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
 
         VirtualFile[] openFiles = fileEditorManager.getOpenFiles();
@@ -98,18 +110,45 @@ public class ToggleVisualizationAction extends AnAction {
         if (psiFile instanceof PsiJavaFile
                 && psiFile.isValid()) {
 
-            // FileEditor instances can be non-textual, so we need to get only the textual ones (Editor)
-            List<Editor> editors = FileEditorManager.getInstance(project).getEditorList(virtualFile)
-                    .stream()
-                    .filter(TextEditor.class::isInstance)
-                    .map(TextEditor.class::cast)
-                    .map(TextEditor::getEditor)
-                    .toList();
+            List<Editor> editors = getEditors(project, virtualFile);
 
             if (!editors.isEmpty())
                 ReadAction.run(() -> highlightTargetMethod((PsiJavaFile) psiFile, project, editors));
         }
+    }
 
+    private void unregisterFileOpenListener() {
+        if (connection == null)
+            return;
+
+        connection.disconnect();
+        connection = null;
+    }
+
+    public void removeFromAllOpenFiles(Project project) {
+        FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+
+        VirtualFile[] openFiles = fileEditorManager.getOpenFiles();
+        for (VirtualFile virtualFile : openFiles) {
+            removeFromFile(project, virtualFile);
+        }
+    }
+
+    private void removeFromFile(Project project, VirtualFile virtualFile) {
+        List<Editor> editors = getEditors(project, virtualFile);
+
+        if (!editors.isEmpty())
+            editors.forEach(editor -> editor.getMarkupModel().removeAllHighlighters());
+    }
+
+    private static List<Editor> getEditors(Project project, VirtualFile virtualFile) {
+        // FileEditor instances can be non-textual, so we need to get only the textual ones (Editor)
+        return FileEditorManager.getInstance(project).getEditorList(virtualFile)
+                .stream()
+                .filter(TextEditor.class::isInstance)
+                .map(TextEditor.class::cast)
+                .map(TextEditor::getEditor)
+                .toList();
     }
 
     private void highlightTargetMethod(PsiJavaFile psiFile, Project project, List<Editor> editors) {
