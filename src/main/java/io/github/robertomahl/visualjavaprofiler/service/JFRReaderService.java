@@ -101,6 +101,7 @@ public class JFRReaderService {
                         profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + event.getLong("duration")));
     }
 
+    //TODO: Add method params to include overloads distinction
     private static String getMethodSignature(RecordedFrame frame) {
         return frame.getMethod().getType().getName() + "." + frame.getMethod().getName();
     }

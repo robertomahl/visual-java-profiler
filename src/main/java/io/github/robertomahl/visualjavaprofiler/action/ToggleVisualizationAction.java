@@ -32,6 +32,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class ToggleVisualizationAction extends AnAction {
 
+    //Profiler Lens
+
     //Essentials
     //TODO: integrate with profiling output
     //TODO: implement scale of colors to differ execution time
@@ -44,8 +46,6 @@ public class ToggleVisualizationAction extends AnAction {
     //Extras
     //TODO: add option to only highlight x% most time-consuming methods - configurable
     //TODO: highlighting most time-consuming files in the project files view as well
-
-    private static final String TARGET_METHOD_SIGNATURE = "com.minguard.service.impl.StatusServiceImpl.findAll()";
 
     @Override
     public void update(AnActionEvent e) {
@@ -114,11 +114,14 @@ public class ToggleVisualizationAction extends AnAction {
     }
 
     private void highlightTargetMethod(PsiJavaFile psiFile, Project project, List<Editor> editors) {
+        if (JFRReaderService.getProfilingResults() == null)
+            throw new IllegalStateException("Profiling results are not set");
+
         for (PsiMethod method : PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class)) {
             String methodSignature = getMethodSignature(method);
-            //TODO: apply to JFR results
-            if (TARGET_METHOD_SIGNATURE.equals(methodSignature)) {
-                editors.forEach(editor -> highlightMethod(project, method, editor));
+            Long methodResult = JFRReaderService.getProfilingResults().get(methodSignature);
+            if (methodResult != null) {
+                editors.forEach(editor -> highlightMethod(project, method, methodResult, editor));
             }
         }
     }
@@ -147,7 +150,8 @@ public class ToggleVisualizationAction extends AnAction {
         return signature.toString();
     }
 
-    private void highlightMethod(Project project, PsiMethod method, Editor editor) {
+    private void highlightMethod(Project project, PsiMethod method, Long methodResult, Editor editor) {
+        //TODO: add scale of colors
         //TODO: change to JBColor, with dark respective color
         TextAttributes attributes = new TextAttributes(null, new Color(255, 165, 0, 100), null, null, Font.PLAIN); // Semi-transparent orange background
 
