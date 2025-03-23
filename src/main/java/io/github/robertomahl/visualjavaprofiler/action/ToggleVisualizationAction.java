@@ -36,6 +36,9 @@ public class ToggleVisualizationAction extends AnAction {
     //Essentials
     //TODO: implement scale of colors to differ execution time
 
+    //Fixes
+    //TODO: make sure overloads are treated as different methods
+
     //Improvements
     //TODO: stop the highlighting if the method's been changed since the profiling execution
     //TODO: also include the actual execution time in a label, besides color highlighting

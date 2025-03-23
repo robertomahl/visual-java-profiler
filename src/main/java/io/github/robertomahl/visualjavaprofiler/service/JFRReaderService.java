@@ -79,7 +79,6 @@ public class JFRReaderService {
                         profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
     }
 
-    //TODO: Add method params to include overloads distinction
     private static String getMethodSignature(RecordedMethod method) {
         return method.getType().getName() + "." + method.getName();
     }
