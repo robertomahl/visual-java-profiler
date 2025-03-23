@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedFrame;
+import jdk.jfr.consumer.RecordedMethod;
 import jdk.jfr.consumer.RecordedStackTrace;
 import jdk.jfr.consumer.RecordingFile;
 
@@ -81,6 +82,7 @@ public class JFRReaderService {
             return;
         }
         stackTrace.getFrames().stream()
+                .map(RecordedFrame::getMethod)
                 .map(JFRReaderService::getMethodSignature)
                 .forEach(methodSignature ->
                         profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
@@ -96,13 +98,14 @@ public class JFRReaderService {
         }
 
         stackTrace.getFrames().stream()
+                .map(RecordedFrame::getMethod)
                 .map(JFRReaderService::getMethodSignature)
                 .forEach(methodSignature ->
                         profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + event.getLong("duration")));
     }
 
     //TODO: Add method params to include overloads distinction
-    private static String getMethodSignature(RecordedFrame frame) {
-        return frame.getMethod().getType().getName() + "." + frame.getMethod().getName();
+    private static String getMethodSignature(RecordedMethod method) {
+        return method.getType().getName() + "." + method.getName();
     }
 }

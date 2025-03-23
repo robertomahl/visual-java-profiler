@@ -20,7 +20,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiParameter;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.messages.MessageBusConnection;
 import io.github.robertomahl.visualjavaprofiler.service.JFRReaderService;
@@ -127,17 +126,15 @@ public class ToggleVisualizationAction extends AnAction {
     }
 
     private String getMethodSignature(PsiMethod method) {
-        PsiClass containingClass = method.getContainingClass();
-        if (containingClass == null) {
-            return null;
-        }
+        final var className = Optional.ofNullable(method.getContainingClass())
+                .map(PsiClass::getQualifiedName)
+                .orElseThrow();
 
-        String className = containingClass.getQualifiedName();
-        if (className == null) {
-            return null;
-        }
+        StringBuilder signature = new StringBuilder(className).append(".").append(method.getName())
+                //.append("(")
+                ;
 
-        StringBuilder signature = new StringBuilder(className).append(".").append(method.getName()).append("(");
+        /*
         PsiParameter[] parameters = method.getParameterList().getParameters();
         for (int i = 0; i < parameters.length; i++) {
             if (i > 0) {
@@ -146,6 +143,7 @@ public class ToggleVisualizationAction extends AnAction {
             signature.append(parameters[i].getType().getCanonicalText());
         }
         signature.append(")");
+         */
 
         return signature.toString();
     }
