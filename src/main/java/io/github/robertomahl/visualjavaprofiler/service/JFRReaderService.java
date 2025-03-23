@@ -17,15 +17,12 @@ public class JFRReaderService {
     private static Path profilingResultPath = null;
     private static Map<String, Long> profilingResults = null;
 
-    private static final Consumer<RecordedEvent> methodRunCountAction = JFRReaderService::computeMethodRunCount;
-    private static final Consumer<RecordedEvent> methodExecutionTimeAction = JFRReaderService::computeMethodExecutionTime;
-    //TODO: add avg execution time
-
     private static final String EXECUTION_SAMPLE_EVENT = "jdk.ExecutionSample";
 
     public enum ProfilingMetric {
-        METHOD_RUN_COUNT(methodRunCountAction),
-        METHOD_EXECUTION_TIME(methodExecutionTimeAction);
+        METHOD_RUN_COUNT(JFRReaderService::computeMethodRunCount),
+        METHOD_EXECUTION_TIME(JFRReaderService::computeMethodExecutionTime);
+        //TODO: add avg execution time
 
         ProfilingMetric(Consumer<RecordedEvent> action) {
             this.action = action;

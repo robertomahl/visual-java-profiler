@@ -29,7 +29,7 @@ public class SelectProfilingResultAction extends AnAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         //TODO: get path from user
-        final var path = "/home/idealogic/IdeaSnapshots/CoreServiceApplication_2025_03_15_235913.jfr";
+        final var path = "/home/idealogic/IdeaSnapshots/CoreServiceApplication_2025_03_23_141821.jfr";
 
         JFRReaderService.setProfilingResultPath(Path.of(path));
         JFRReaderService.read();
