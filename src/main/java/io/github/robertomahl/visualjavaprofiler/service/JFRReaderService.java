@@ -1,5 +1,9 @@
 package io.github.robertomahl.visualjavaprofiler.service;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.ProjectScope;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,6 +19,7 @@ public class JFRReaderService {
     private static ProfilingMetric profilingMetric = ProfilingMetric.METHOD_RUN_COUNT;
     private static RecordingFile recordingFile = null;
     private static Map<String, Long> profilingResults = null;
+    private static Project project = null;
 
     private static final String EXECUTION_SAMPLE_EVENT = "jdk.ExecutionSample";
 
@@ -49,10 +54,11 @@ public class JFRReaderService {
         JFRReaderService.recordingFile = recordingFile;
     }
 
-    public static void read() {
+    public static void read(Project project) {
         if (JFRReaderService.isNotRecordingFileSet())
             throw new IllegalArgumentException("Profiling result path is not set");
 
+        JFRReaderService.project = project;
         profilingResults = new ConcurrentHashMap<>();
 
         while (recordingFile.hasMoreEvents()) {
@@ -74,9 +80,17 @@ public class JFRReaderService {
         }
         stackTrace.getFrames().stream()
                 .map(RecordedFrame::getMethod)
+                .filter(JFRReaderService::isInProjectScope)
                 .map(JFRReaderService::getMethodSignature)
                 .forEach(methodSignature ->
                         profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
+    }
+
+    private static boolean isInProjectScope(RecordedMethod method) {
+        JavaPsiFacade facade = JavaPsiFacade.getInstance(project);
+        GlobalSearchScope scope = ProjectScope.getProjectScope(project);
+
+        return facade.findClass(method.getType().getName(), scope) != null;
     }
 
     private static String getMethodSignature(RecordedMethod method) {
