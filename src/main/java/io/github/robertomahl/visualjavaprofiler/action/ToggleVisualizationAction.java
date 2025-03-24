@@ -47,6 +47,7 @@ public class ToggleVisualizationAction extends AnAction {
     //TODO: add new metrics
     //TODO: add option to only highlight x% most time-consuming methods - configurable
     //TODO: highlighting most time-consuming files in the project files view as well
+    //TODO: see highlights in the scrollbar
 
     private static boolean isVisible = false;
 

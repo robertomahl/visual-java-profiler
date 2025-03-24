@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="baa778e1-8057-49f4-84fb-4fcd17f5fbb0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/SelectProfilingMetricAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/SelectProfilingMetricAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/ToggleVisualizationAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/ToggleVisualizationAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/service/JFRReaderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/service/JFRReaderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,17 +29,7 @@
         </task>
         <projects_view>
           <tree_state>
-            <expand>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="visual-java-profiler" type="f1a62948:ProjectNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="visual-java-profiler" type="f1a62948:ProjectNode" />
-                <item name="Run Configurations" type="7b0102dc:RunConfigurationsNode" />
-              </path>
-            </expand>
+            <expand />
             <select />
           </tree_state>
         </projects_view>
@@ -92,7 +80,7 @@
     &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/idealogic/Documentos/Pessoal/minguard-be&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/idealogic/IdeaSnapshots/Run_Plugin_2025_03_24_142327.jfr&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -100,6 +88,11 @@
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;profiler.jvm&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;kotlin-gradle-user-dirs&quot;: [
+      &quot;/home/idealogic/.gradle&quot;
+    ]
   }
 }</component>
   <component name="RecentsManager">
@@ -223,14 +216,6 @@
       </list>
     </recent_temporary>
   </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-jdk-9823dce3aa75-a94e463ab2e7-intellij.indexing.shared.core-IU-243.25659.59" />
-        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-IU-243.25659.59" />
-      </set>
-    </attachedChunks>
-  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -257,7 +242,10 @@
       <workItem from="1742342641100" duration="3109000" />
       <workItem from="1742384477621" duration="3000" />
       <workItem from="1742650742937" duration="23480000" />
-      <workItem from="1742753964103" duration="10034000" />
+      <workItem from="1742753964103" duration="14702000" />
+      <workItem from="1742834968673" duration="2724000" />
+      <workItem from="1742837834167" duration="148000" />
+      <workItem from="1742844666315" duration="2714000" />
     </task>
     <servers />
   </component>
