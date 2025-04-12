@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="baa778e1-8057-49f4-84fb-4fcd17f5fbb0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/service/JFRReaderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/service/JFRReaderService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,7 +105,7 @@
       <recent name="io.github.robertomahl.visualjavaprofiler" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.Run Plugin">
+  <component name="RunManager" selected="Application.JFRReaderService">
     <configuration name="JFRReaderService" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="io.github.robertomahl.visualjavaprofiler.service.JFRReaderService" />
       <module name="visual-java-profiler.main" />
@@ -216,6 +217,14 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-a94e463ab2e7-intellij.indexing.shared.core-IU-243.25659.59" />
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-IU-243.25659.59" />
+      </set>
+    </attachedChunks>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -245,7 +254,12 @@
       <workItem from="1742753964103" duration="14702000" />
       <workItem from="1742834968673" duration="2724000" />
       <workItem from="1742837834167" duration="148000" />
-      <workItem from="1742844666315" duration="2714000" />
+      <workItem from="1742844666315" duration="3610000" />
+      <workItem from="1742907634146" duration="21000" />
+      <workItem from="1743352805792" duration="5703000" />
+      <workItem from="1743987324802" duration="816000" />
+      <workItem from="1744463430360" duration="876000" />
+      <workItem from="1744464688589" duration="1966000" />
     </task>
     <servers />
   </component>

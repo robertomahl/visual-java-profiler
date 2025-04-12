@@ -78,12 +78,22 @@ public class JFRReaderService {
         if (stackTrace == null) {
             return;
         }
+        // Flat profile - JFR Style
         stackTrace.getFrames().stream()
                 .map(RecordedFrame::getMethod)
                 .filter(JFRReaderService::isInProjectScope)
+                .findAny()
                 .map(JFRReaderService::getMethodSignature)
-                .forEach(methodSignature ->
+                .ifPresent(methodSignature ->
                         profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
+
+        // Inclusive profile
+//        stackTrace.getFrames().stream()
+//                .map(RecordedFrame::getMethod)
+//                .filter(JFRReaderService::isInProjectScope)
+//                .map(JFRReaderService::getMethodSignature)
+//                .forEach(methodSignature ->
+//                        profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
     }
 
     private static boolean isInProjectScope(RecordedMethod method) {
