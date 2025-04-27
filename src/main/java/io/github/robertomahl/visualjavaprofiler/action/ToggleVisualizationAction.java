@@ -35,6 +35,7 @@ public class ToggleVisualizationAction extends AnAction {
 
     //Essentials
     //TODO: implement scale of colors to differ execution time
+    //TODO: add option to only highlight x% most time-consuming methods - configurable
 
     //Fixes
     //TODO: make sure overloads are treated as different methods
@@ -45,8 +46,7 @@ public class ToggleVisualizationAction extends AnAction {
 
     //Extras
     //TODO: add new metrics
-    //TODO: add option to only highlight x% most time-consuming methods - configurable
-    //TODO: highlighting most time-consuming files in the project files view as well
+    //TODO: highlight most time-consuming files in the project files view as well
     //TODO: see highlights in the scrollbar
 
     private static boolean isVisible = false;
@@ -92,7 +92,7 @@ public class ToggleVisualizationAction extends AnAction {
         connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
             @Override
             public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-                //Moving operation to BGT, since Psi reading is costly and shouldn't be done in EDT
+                //Moving operation to BGT, since PSI reading is costly and shouldn't be done in EDT, which is default here
                 ApplicationManager.getApplication().executeOnPooledThread(() -> {
                     applyToFile(project, file);
                 });
