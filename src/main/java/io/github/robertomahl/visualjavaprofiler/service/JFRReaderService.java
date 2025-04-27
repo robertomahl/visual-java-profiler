@@ -82,7 +82,7 @@ public class JFRReaderService {
         stackTrace.getFrames().stream()
                 .map(RecordedFrame::getMethod)
                 .filter(JFRReaderService::isInProjectScope)
-                .findAny()
+                .findFirst()
                 .map(JFRReaderService::getMethodSignature)
                 .ifPresent(methodSignature ->
                         profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
