@@ -36,18 +36,20 @@ public class ToggleVisualizationAction extends AnAction {
     //Essentials
     //TODO: implement scale of colors to differ execution time
     //TODO: add option to only highlight x% most time-consuming methods - configurable
+    //TODO: publish the plugin to JetBrains Marketplace
 
     //Fixes
     //TODO: make sure overloads are treated as different methods
+    //TODO: adapt service class architecture according to official docs
 
     //Improvements
-    //TODO: stop the highlighting if the method's been changed since the profiling execution
     //TODO: also include the actual execution time in a label, besides color highlighting
+    //TODO: add new metrics
 
     //Extras
-    //TODO: add new metrics
     //TODO: highlight most time-consuming files in the project files view as well
     //TODO: see highlights in the scrollbar
+    //TODO: collect user interaction data
 
     private static boolean isVisible = false;
 

@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="baa778e1-8057-49f4-84fb-4fcd17f5fbb0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/ToggleVisualizationAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/ToggleVisualizationAction.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,36 +63,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Gradle.Run Plugin.executor": "Run",
-    "Gradle.visual-java-profiler [:io.github.robertomahl.visualjavaprofiler.service.JFRAnalyzerService.main()].executor": "Run",
-    "Gradle.visual-java-profiler [buildDependents].executor": "Run",
-    "Gradle.visual-java-profiler [buildEnvironment].executor": "Run",
-    "Gradle.visual-java-profiler [buildNeeded].executor": "Run",
-    "Gradle.visual-java-profiler [buildPlugin].executor": "Run",
-    "Gradle.visual-java-profiler [build].executor": "Run",
-    "Gradle.visual-java-profiler [clean].executor": "Run",
-    "Gradle.visual-java-profiler [dependencies].executor": "Run",
-    "Gradle.visual-java-profiler [init].executor": "Run",
-    "Gradle.visual-java-profiler [setupDependencies].executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/idealogic/IdeaSnapshots/Run_Plugin_2025_03_24_142327.jfr",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "show.migrate.to.gradle.popup": "false",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Gradle.Run Plugin.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.visual-java-profiler [:io.github.robertomahl.visualjavaprofiler.service.JFRAnalyzerService.main()].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.visual-java-profiler [buildDependents].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.visual-java-profiler [buildEnvironment].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.visual-java-profiler [buildNeeded].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.visual-java-profiler [buildPlugin].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.visual-java-profiler [build].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.visual-java-profiler [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.visual-java-profiler [dependencies].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.visual-java-profiler [init].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.visual-java-profiler [setupDependencies].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/idealogic/IdeaSnapshots/Run_Plugin_2025_03_24_142327.jfr&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/java" />
@@ -101,7 +102,7 @@
       <recent name="io.github.robertomahl.visualjavaprofiler" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.Run Plugin">
+  <component name="RunManager" selected="Application.JFRReaderService">
     <configuration name="JFRReaderService" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="io.github.robertomahl.visualjavaprofiler.service.JFRReaderService" />
       <module name="visual-java-profiler.main" />
@@ -259,7 +260,13 @@
       <workItem from="1744630496305" duration="4000" />
       <workItem from="1745170723492" duration="7253000" />
       <workItem from="1745320993285" duration="127000" />
-      <workItem from="1745693436972" duration="25167000" />
+      <workItem from="1745693436972" duration="27024000" />
+      <workItem from="1745844195253" duration="7000" />
+      <workItem from="1745979011312" duration="2688000" />
+      <workItem from="1746016013592" duration="25000" />
+      <workItem from="1746043397422" duration="5788000" />
+      <workItem from="1746189001247" duration="7000" />
+      <workItem from="1746578017446" duration="1161000" />
     </task>
     <servers />
   </component>
