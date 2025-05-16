@@ -50,11 +50,12 @@ public class JFRReaderService {
         JFRReaderService.profilingMetric = profilingMetric;
     }
 
-    public static synchronized void setRecordingFile(RecordingFile recordingFile) {
+    public static synchronized void setRecordingFile(RecordingFile recordingFile, Project project) {
         JFRReaderService.recordingFile = recordingFile;
+        JFRReaderService.read(project);
     }
 
-    public static void read(Project project) {
+    private static void read(Project project) {
         if (JFRReaderService.isNotRecordingFileSet())
             throw new IllegalArgumentException("Profiling result path is not set");
 
