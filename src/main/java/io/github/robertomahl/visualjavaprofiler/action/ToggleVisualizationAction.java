@@ -40,11 +40,11 @@ public class ToggleVisualizationAction extends AnAction {
 
     //Fixes
     //TODO: make sure overloads are treated as different methods
-    //TODO: adapt service class architecture according to official docs
 
     //Improvements
     //TODO: also include the actual execution time in a label, besides color highlighting
     //TODO: add new metrics
+    //TODO: indicate whether visualization is active or not
 
     //Extras
     //TODO: highlight most time-consuming files in the project files view as well
@@ -77,7 +77,8 @@ public class ToggleVisualizationAction extends AnAction {
             unregisterFileOpenListener();
             removeFromAllOpenFiles(project);
         } else {
-            if (JFRReaderService.isNotRecordingFileSet())
+            final var jfrReaderService = project.getService(JFRReaderService.class);
+            if (jfrReaderService.isNotRecordingFileSet())
                 new SelectProfilingResultAction().actionPerformed(anActionEvent);
 
             registerFileOpenListener(project);
@@ -158,12 +159,13 @@ public class ToggleVisualizationAction extends AnAction {
     }
 
     private void highlightTargetMethod(PsiJavaFile psiFile, Project project, List<Editor> editors) {
-        if (JFRReaderService.getProfilingResults() == null)
+        final var jfrReaderService = project.getService(JFRReaderService.class);
+        if (jfrReaderService.getProfilingResults() == null)
             throw new IllegalStateException("Profiling results are not set");
 
         for (PsiMethod method : PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class)) {
             String methodSignature = getMethodSignature(method);
-            Long methodResult = JFRReaderService.getProfilingResults().get(methodSignature);
+            Long methodResult = jfrReaderService.getProfilingResults().get(methodSignature);
             if (methodResult != null) {
                 editors.forEach(editor -> highlightMethod(project, method, methodResult, editor));
             }

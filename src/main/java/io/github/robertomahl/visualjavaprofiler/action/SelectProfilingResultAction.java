@@ -46,7 +46,9 @@ public class SelectProfilingResultAction extends AnAction {
         VirtualFile file = FileChooser.chooseFile(descriptor, project, null);
         if (file != null) {
             try (RecordingFile recordingFile = new RecordingFile(Path.of(file.getPath()))) {
-                JFRReaderService.setRecordingFile(recordingFile, e.getProject());
+
+                final var jfrReaderService = project.getService(JFRReaderService.class);
+                jfrReaderService.setRecordingFile(recordingFile);
 
                 final var toggleVisualizationAction = new ToggleVisualizationAction();
                 toggleVisualizationAction.removeFromAllOpenFiles(project);

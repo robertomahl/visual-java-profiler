@@ -1,5 +1,6 @@
 package io.github.robertomahl.visualjavaprofiler.service;
 
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -7,66 +8,71 @@ import com.intellij.psi.search.ProjectScope;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedFrame;
 import jdk.jfr.consumer.RecordedMethod;
 import jdk.jfr.consumer.RecordedStackTrace;
 import jdk.jfr.consumer.RecordingFile;
 
-public class JFRReaderService {
-
-    private static ProfilingMetric profilingMetric = ProfilingMetric.METHOD_RUN_COUNT;
-    private static RecordingFile recordingFile = null;
-    private static Map<String, Long> profilingResults = null;
-    private static Project project = null;
+@Service(Service.Level.PROJECT)
+public final class JFRReaderService {
 
     private static final String EXECUTION_SAMPLE_EVENT = "jdk.ExecutionSample";
 
-    public enum ProfilingMetric {
-        METHOD_RUN_COUNT(JFRReaderService::computeMethodRunCount),
-        ;
+    private final Project project;
 
-        ProfilingMetric(Consumer<RecordedEvent> action) {
+    private ProfilingMetric profilingMetric = ProfilingMetric.METHOD_RUN_COUNT;
+    private RecordingFile recordingFile = null;
+    private Map<String, Long> profilingResults = null;
+
+    JFRReaderService(Project project) {
+        this.project = project;
+    }
+
+    public enum ProfilingMetric {
+        METHOD_RUN_COUNT(JFRReaderService::computeMethodRunCount);
+
+        ProfilingMetric(BiConsumer<JFRReaderService, RecordedEvent> action) {
             this.action = action;
         }
 
-        private final Consumer<RecordedEvent> action;
+        private final BiConsumer<JFRReaderService, RecordedEvent> action;
 
-        public Consumer<RecordedEvent> getAction() {
-            return action;
+        public void apply(JFRReaderService service, RecordedEvent event) {
+            action.accept(service, event);
         }
     }
 
-    public static synchronized boolean isNotRecordingFileSet() {
+    public boolean isNotRecordingFileSet() {
         return recordingFile == null;
     }
 
-    public static synchronized Map<String, Long> getProfilingResults() {
+    public Map<String, Long> getProfilingResults() {
         return profilingResults;
     }
 
-    public static synchronized void setProfilingMetric(ProfilingMetric profilingMetric) {
-        JFRReaderService.profilingMetric = profilingMetric;
+    public void setProfilingMetric(ProfilingMetric profilingMetric) {
+        this.profilingMetric = profilingMetric;
+        read();
     }
 
-    public static synchronized void setRecordingFile(RecordingFile recordingFile, Project project) {
-        JFRReaderService.recordingFile = recordingFile;
-        JFRReaderService.read(project);
+    public void setRecordingFile(RecordingFile recordingFile) {
+        this.recordingFile = recordingFile;
+        read();
     }
 
-    private static void read(Project project) {
-        if (JFRReaderService.isNotRecordingFileSet())
+    private void read() {
+        if (isNotRecordingFileSet())
             throw new IllegalArgumentException("Profiling result path is not set");
 
-        JFRReaderService.project = project;
         profilingResults = new ConcurrentHashMap<>();
 
         while (recordingFile.hasMoreEvents()) {
             try {
                 RecordedEvent event = recordingFile.readEvent();
                 if (EXECUTION_SAMPLE_EVENT.equals(event.getEventType().getName())) {
-                    profilingMetric.getAction().accept(event);
+                    profilingMetric.apply(this, event);
                 }
             } catch (IOException ex) {
                 throw new RuntimeException("Error reading JFR file", ex);
@@ -74,7 +80,7 @@ public class JFRReaderService {
         }
     }
 
-    private static void computeMethodRunCount(RecordedEvent event) {
+    public void computeMethodRunCount(RecordedEvent event) {
         RecordedStackTrace stackTrace = event.getStackTrace();
         if (stackTrace == null) {
             return;
@@ -82,9 +88,9 @@ public class JFRReaderService {
         // Flat profile - JFR Style
         stackTrace.getFrames().stream()
                 .map(RecordedFrame::getMethod)
-                .filter(JFRReaderService::isInProjectScope)
+                .filter(this::isInProjectScope)
                 .findFirst()
-                .map(JFRReaderService::getMethodSignature)
+                .map(this::getMethodSignature)
                 .ifPresent(methodSignature ->
                         profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
 
@@ -97,14 +103,14 @@ public class JFRReaderService {
 //                        profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
     }
 
-    private static boolean isInProjectScope(RecordedMethod method) {
+    private boolean isInProjectScope(RecordedMethod method) {
         JavaPsiFacade facade = JavaPsiFacade.getInstance(project);
         GlobalSearchScope scope = ProjectScope.getProjectScope(project);
 
         return facade.findClass(method.getType().getName(), scope) != null;
     }
 
-    private static String getMethodSignature(RecordedMethod method) {
+    private String getMethodSignature(RecordedMethod method) {
         return method.getType().getName() + "." + method.getName();
     }
 }
