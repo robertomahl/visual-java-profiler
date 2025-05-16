@@ -22,7 +22,7 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.messages.MessageBusConnection;
-import io.github.robertomahl.visualjavaprofiler.service.JFRReaderService;
+import io.github.robertomahl.visualjavaprofiler.service.JFRProcessingService;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.List;
@@ -77,8 +77,8 @@ public class ToggleVisualizationAction extends AnAction {
             unregisterFileOpenListener();
             removeFromAllOpenFiles(project);
         } else {
-            final var jfrReaderService = project.getService(JFRReaderService.class);
-            if (jfrReaderService.isNotRecordingFileSet())
+            final var jfrProcessingService = project.getService(JFRProcessingService.class);
+            if (jfrProcessingService.isProfilingResultsNotProcessed())
                 new SelectProfilingResultAction().actionPerformed(anActionEvent);
 
             registerFileOpenListener(project);
@@ -159,13 +159,13 @@ public class ToggleVisualizationAction extends AnAction {
     }
 
     private void highlightTargetMethod(PsiJavaFile psiFile, Project project, List<Editor> editors) {
-        final var jfrReaderService = project.getService(JFRReaderService.class);
-        if (jfrReaderService.getProfilingResults() == null)
+        final var jfrProcessingService = project.getService(JFRProcessingService.class);
+        if (jfrProcessingService.getProfilingResults() == null)
             throw new IllegalStateException("Profiling results are not set");
 
         for (PsiMethod method : PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class)) {
             String methodSignature = getMethodSignature(method);
-            Long methodResult = jfrReaderService.getProfilingResults().get(methodSignature);
+            Long methodResult = jfrProcessingService.getProfilingResults().get(methodSignature);
             if (methodResult != null) {
                 editors.forEach(editor -> highlightMethod(project, method, methodResult, editor));
             }

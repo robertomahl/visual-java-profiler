@@ -10,7 +10,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
-import io.github.robertomahl.visualjavaprofiler.service.JFRReaderService;
+import io.github.robertomahl.visualjavaprofiler.service.JFRProcessingService;
 import java.io.IOException;
 import java.nio.file.Path;
 import jdk.jfr.consumer.RecordingFile;
@@ -47,8 +47,8 @@ public class SelectProfilingResultAction extends AnAction {
         if (file != null) {
             try (RecordingFile recordingFile = new RecordingFile(Path.of(file.getPath()))) {
 
-                final var jfrReaderService = project.getService(JFRReaderService.class);
-                jfrReaderService.setRecordingFile(recordingFile);
+                final var jfrProcessingService = project.getService(JFRProcessingService.class);
+                jfrProcessingService.read(recordingFile);
 
                 final var toggleVisualizationAction = new ToggleVisualizationAction();
                 toggleVisualizationAction.removeFromAllOpenFiles(project);

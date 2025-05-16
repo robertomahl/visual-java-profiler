@@ -8,7 +8,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/SelectProfilingResultAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/SelectProfilingResultAction.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/ToggleVisualizationAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/ToggleVisualizationAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/service/JFRReaderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/service/JFRReaderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/service/JFRReaderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/service/JFRProcessingService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,8 +58,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Action" />
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -121,8 +121,8 @@
     </key>
   </component>
   <component name="RunManager" selected="Gradle.Run Plugin">
-    <configuration name="JFRReaderService" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="io.github.robertomahl.visualjavaprofiler.service.JFRReaderService" />
+    <configuration name="JFRProcessingService" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="io.github.robertomahl.visualjavaprofiler.service.JFRProcessingService" />
       <module name="visual-java-profiler.main" />
       <extension name="coverage">
         <pattern>
@@ -227,7 +227,7 @@
         <item itemvalue="Gradle.visual-java-profiler [buildPlugin]" />
         <item itemvalue="Gradle.visual-java-profiler [clean]" />
         <item itemvalue="Gradle.visual-java-profiler [buildEnvironment]" />
-        <item itemvalue="Application.JFRReaderService" />
+        <item itemvalue="Application.JFRProcessingService" />
         <item itemvalue="Gradle.visual-java-profiler [init]" />
       </list>
     </recent_temporary>
@@ -289,7 +289,7 @@
       <workItem from="1746667626190" duration="3776000" />
       <workItem from="1746705643827" duration="13000" />
       <workItem from="1746895558342" duration="1252000" />
-      <workItem from="1747354238659" duration="3585000" />
+      <workItem from="1747354238659" duration="5544000" />
     </task>
     <servers />
   </component>
