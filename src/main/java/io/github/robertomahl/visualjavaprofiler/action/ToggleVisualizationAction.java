@@ -15,6 +15,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiAnonymousClass;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
@@ -45,6 +46,8 @@ public class ToggleVisualizationAction extends AnAction {
     //TODO: also include the actual execution time in a label, besides color highlighting
     //TODO: add new metrics
     //TODO: indicate whether visualization is active or not
+    //TODO: loading screen
+    //TODO: processing seems to be done in EDT, which is not ideal. It should be done in a background thread.
 
     //Extras
     //TODO: highlight most time-consuming files in the project files view as well
@@ -163,7 +166,15 @@ public class ToggleVisualizationAction extends AnAction {
         if (jfrProcessingService.getProfilingResults() == null)
             throw new IllegalStateException("Profiling results are not set");
 
-        for (PsiMethod method : PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class)) {
+        List<PsiMethod> psiFileMethods = PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class)
+                .stream()
+                // Filter out methods that are in anonymous classes. Those methods are not being handled yet
+                //.filter(psiMethod -> !(psiMethod.getContainingClass() instanceof PsiAnonymousClass))
+                // Filter out methods that are in classes that are not yet being handled, such as anonymous and local classes
+                .filter(psiMethod -> psiMethod.getContainingClass() != null && psiMethod.getContainingClass().getQualifiedName() != null)
+                .toList();
+
+        for (PsiMethod method : psiFileMethods) {
             String methodSignature = getMethodSignature(method);
             Long methodResult = jfrProcessingService.getProfilingResults().get(methodSignature);
             if (methodResult != null) {
@@ -177,22 +188,7 @@ public class ToggleVisualizationAction extends AnAction {
                 .map(PsiClass::getQualifiedName)
                 .orElseThrow();
 
-        StringBuilder signature = new StringBuilder(className).append(".").append(method.getName())
-                //.append("(")
-                ;
-
-        /*
-        PsiParameter[] parameters = method.getParameterList().getParameters();
-        for (int i = 0; i < parameters.length; i++) {
-            if (i > 0) {
-                signature.append(", ");
-            }
-            signature.append(parameters[i].getType().getCanonicalText());
-        }
-        signature.append(")");
-         */
-
-        return signature.toString();
+        return className + "." + method.getName();
     }
 
     private void highlightMethod(Project project, PsiMethod method, Long methodResult, Editor editor) {
