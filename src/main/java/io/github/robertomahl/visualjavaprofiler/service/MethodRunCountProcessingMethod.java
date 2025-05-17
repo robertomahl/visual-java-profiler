@@ -13,23 +13,21 @@ import jdk.jfr.consumer.RecordedMethod;
 import jdk.jfr.consumer.RecordedStackTrace;
 import jdk.jfr.consumer.RecordingFile;
 
-public class MethodRunCountProfiler {
+public class MethodRunCountProcessingMethod implements ProfilingMetricProcessingMethod {
 
     private static final String EXECUTION_SAMPLE_EVENT = "jdk.ExecutionSample";
 
-    private final Project project;
-
-    public MethodRunCountProfiler(Project project) {
-        this.project = project;
+    public MethodRunCountProcessingMethod() {
     }
 
-    public Map<String, Long> compute(RecordingFile recordingFile) {
+    @Override
+    public Map<String, Long> compute(Project project, RecordingFile recordingFile) {
         Map<String, Long> profilingResults = new HashMap<>();
         while (recordingFile.hasMoreEvents()) {
             try {
                 RecordedEvent event = recordingFile.readEvent();
                 if (EXECUTION_SAMPLE_EVENT.equals(event.getEventType().getName())) {
-                    computeEvent(profilingResults, event);
+                    computeEvent(project, profilingResults, event);
                 }
             } catch (IOException ex) {
                 throw new RuntimeException("Error reading JFR file", ex);
@@ -38,35 +36,35 @@ public class MethodRunCountProfiler {
         return profilingResults;
     }
 
-    private void computeEvent(Map<String, Long> profilingResults, RecordedEvent event) {
+    private void computeEvent(Project project, Map<String, Long> profilingResults, RecordedEvent event) {
         RecordedStackTrace stackTrace = event.getStackTrace();
         if (stackTrace == null) {
             return;
         }
-        flatProfile(profilingResults, stackTrace);
-        //inclusiveProfile(profilingResults, stackTrace);
+        flatProfile(project, profilingResults, stackTrace);
+        //inclusiveProfile(project, profilingResults, stackTrace);
     }
 
-    private void inclusiveProfile(Map<String, Long> profilingResults, RecordedStackTrace stackTrace) {
+    private void inclusiveProfile(Project project, Map<String, Long> profilingResults, RecordedStackTrace stackTrace) {
         stackTrace.getFrames().stream()
                 .map(RecordedFrame::getMethod)
-                .filter(this::isInProjectScope)
+                .filter(method -> isInProjectScope(project, method))
                 .map(this::getMethodSignature)
                 .forEach(methodSignature ->
                         profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
     }
 
-    private void flatProfile(Map<String, Long> profilingResults, RecordedStackTrace stackTrace) {
+    private void flatProfile(Project project, Map<String, Long> profilingResults, RecordedStackTrace stackTrace) {
         stackTrace.getFrames().stream()
                 .map(RecordedFrame::getMethod)
-                .filter(this::isInProjectScope)
+                .filter(method -> isInProjectScope(project, method))
                 .findFirst()
                 .map(this::getMethodSignature)
                 .ifPresent(methodSignature ->
                         profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
     }
 
-    private boolean isInProjectScope(RecordedMethod method) {
+    private boolean isInProjectScope(Project project, RecordedMethod method) {
         if (method == null || method.getType() == null || method.getType().getName() == null) {
             return false;
         }

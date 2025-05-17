@@ -4,7 +4,6 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
 import jdk.jfr.consumer.RecordingFile;
 
 @Service(Service.Level.PROJECT)
@@ -12,28 +11,12 @@ public final class JFRProcessingService {
 
     private ProfilingMetric activeProfilingMetric = ProfilingMetric.METHOD_RUN_COUNT;
 
-    private final MethodRunCountProfiler methodRunCountProfiler;
-
-    private final Map<ProfilingMetric, Map<String, Long>> profilingResultsPerMetric = new HashMap<>() {{
-        put(ProfilingMetric.METHOD_RUN_COUNT, null);
-    }};
+    private final Project project;
+    private final Map<ProfilingMetric, Map<String, Long>> profilingResultsPerMetric;
 
     JFRProcessingService(Project project) {
-        this.methodRunCountProfiler = new MethodRunCountProfiler(project);
-    }
-
-    public enum ProfilingMetric {
-        METHOD_RUN_COUNT((service, file) -> service.methodRunCountProfiler.compute(file));
-
-        ProfilingMetric(BiFunction<JFRProcessingService, RecordingFile, Map<String, Long>> action) {
-            this.action = action;
-        }
-
-        private final BiFunction<JFRProcessingService, RecordingFile, Map<String, Long>> action;
-
-        public Map<String, Long> apply(JFRProcessingService service, RecordingFile file) {
-            return action.apply(service, file);
-        }
+        this.project = project;
+        this.profilingResultsPerMetric = new HashMap<>();
     }
 
     public boolean isProfilingResultsNotProcessed() {
@@ -53,8 +36,8 @@ public final class JFRProcessingService {
             throw new IllegalArgumentException("RecordingFile cannot be null.");
         }
 
-        for (Map.Entry<ProfilingMetric, Map<String, Long>> entry : profilingResultsPerMetric.entrySet()) {
-            entry.setValue(entry.getKey().apply(this, recordingFile));
+        for (ProfilingMetric profilingMetric : ProfilingMetric.values()) {
+            profilingResultsPerMetric.put(profilingMetric, profilingMetric.compute(project, recordingFile));
         }
     }
 }
