@@ -21,7 +21,7 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
     }
 
     @Override
-    public Map<String, Long> compute(Project project, RecordingFile recordingFile) {
+    public ProcessingMethodResult compute(Project project, RecordingFile recordingFile) {
         Map<String, Long> profilingResults = new HashMap<>();
         while (recordingFile.hasMoreEvents()) {
             try {
@@ -33,7 +33,7 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
                 throw new RuntimeException("Error reading JFR file", ex);
             }
         }
-        return profilingResults;
+        return new ProcessingMethodResult(profilingResults);
     }
 
     private void computeEvent(Project project, Map<String, Long> profilingResults, RecordedEvent event) {

@@ -37,7 +37,7 @@ public final class JFRProcessingService {
         }
 
         for (ProfilingMetric profilingMetric : ProfilingMetric.values()) {
-            profilingResultsPerMetric.put(profilingMetric, profilingMetric.compute(project, recordingFile));
+            profilingResultsPerMetric.put(profilingMetric, profilingMetric.compute(project, recordingFile).getResultMap());
         }
     }
 }
