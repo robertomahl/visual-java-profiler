@@ -6,7 +6,10 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import jdk.jfr.consumer.RecordedClass;
 import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedFrame;
 import jdk.jfr.consumer.RecordedMethod;
@@ -16,6 +19,9 @@ import jdk.jfr.consumer.RecordingFile;
 public class MethodRunCountProcessingMethod implements ProfilingMetricProcessingMethod {
 
     private static final String EXECUTION_SAMPLE_EVENT = "jdk.ExecutionSample";
+
+    private final Set<RecordedClass> classesInProjectScope = new HashSet<>();
+    private final Set<RecordedClass> classesNotInProjectScope = new HashSet<>();
 
     public MethodRunCountProcessingMethod() {
     }
@@ -68,9 +74,23 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
         if (method == null || method.getType() == null || method.getType().getName() == null) {
             return false;
         }
+
+        if (classesInProjectScope.contains(method.getType()))
+            return true;
+        else if (classesNotInProjectScope.contains(method.getType()))
+            return false;
+
         JavaPsiFacade facade = JavaPsiFacade.getInstance(project);
         GlobalSearchScope scope = ProjectScope.getProjectScope(project);
-        return facade.findClass(method.getType().getName(), scope) != null;
+
+        final var isInProjectScope = facade.findClass(method.getType().getName(), scope) != null;
+
+        if (isInProjectScope)
+            classesInProjectScope.add(method.getType());
+        else
+            classesNotInProjectScope.add(method.getType());
+
+        return isInProjectScope;
     }
 
     private String getMethodSignature(RecordedMethod method) {
