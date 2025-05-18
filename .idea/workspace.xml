@@ -6,8 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="baa778e1-8057-49f4-84fb-4fcd17f5fbb0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/SelectProfilingMetricAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/SelectProfilingMetricAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/SelectProfilingResultAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/SelectProfilingResultAction.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/ToggleVisualizationAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/ToggleVisualizationAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/service/MethodRunCountProcessingMethod.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/service/MethodRunCountProcessingMethod.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,7 +101,7 @@
     &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/idealogic/IdeaSnapshots/Run_Plugin_2025_05_17_134727.jfr&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/idealogic/Documentos/Pessoal/visual-java-profiler&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -243,9 +244,9 @@
       <list>
         <item itemvalue="Gradle.visual-java-profiler [build]" />
         <item itemvalue="Gradle.visual-java-profiler [clean]" />
+        <item itemvalue="Gradle.visual-java-profiler [build]" />
+        <item itemvalue="Gradle.visual-java-profiler [clean]" />
         <item itemvalue="Gradle.visual-java-profiler [buildDependents]" />
-        <item itemvalue="Gradle.visual-java-profiler [buildPlugin]" />
-        <item itemvalue="Gradle.visual-java-profiler [buildEnvironment]" />
       </list>
     </recent_temporary>
   </component>
@@ -300,7 +301,7 @@
       <workItem from="1746895558342" duration="1252000" />
       <workItem from="1747354238659" duration="9302000" />
       <workItem from="1747397854360" duration="602000" />
-      <workItem from="1747491134034" duration="18617000" />
+      <workItem from="1747491134034" duration="27465000" />
     </task>
     <servers />
   </component>

@@ -15,7 +15,6 @@ public class SelectProfilingMetricAction extends AnAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // Using background threads (BGT)
         return ActionUpdateThread.BGT;
     }
 

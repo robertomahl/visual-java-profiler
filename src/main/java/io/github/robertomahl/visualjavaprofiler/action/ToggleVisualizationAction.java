@@ -40,16 +40,15 @@ public class ToggleVisualizationAction extends AnAction {
     //TODO: publish the plugin to JetBrains Marketplace
 
     //Fixes
-    //TODO: make sure overloads are treated as different methods
+    //TODO: make sure local, anonymous and lambda classes are handled
 
     //Improvements
-    //TODO: also include the actual execution time in a label, besides color highlighting
     //TODO: add new metrics
     //TODO: indicate whether visualization is active or not
     //TODO: loading screen
-    //TODO: processing seems to be done in EDT, which is not ideal. It should be done in a background thread.
 
     //Extras
+    //TODO: also include the actual execution time in a label, besides color highlighting
     //TODO: highlight most time-consuming files in the project files view as well
     //TODO: see highlights in the scrollbar
     //TODO: collect user interaction data
@@ -63,12 +62,13 @@ public class ToggleVisualizationAction extends AnAction {
         Project project = e.getProject();
         Editor editor = e.getData(CommonDataKeys.EDITOR);
 
-        e.getPresentation().setEnabled(project != null && editor != null);
+        e.getPresentation().setEnabled(project != null
+                && editor != null
+                && !project.getService(JFRProcessingService.class).isProfilingResultsNotProcessed());
     }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // Using background threads (BGT)
         return ActionUpdateThread.BGT;
     }
 
@@ -80,10 +80,6 @@ public class ToggleVisualizationAction extends AnAction {
             unregisterFileOpenListener();
             removeFromAllOpenFiles(project);
         } else {
-            final var jfrProcessingService = project.getService(JFRProcessingService.class);
-            if (jfrProcessingService.isProfilingResultsNotProcessed())
-                new SelectProfilingResultAction().actionPerformed(anActionEvent);
-
             registerFileOpenListener(project);
             applyToAllOpenFiles(project);
         }
@@ -98,10 +94,7 @@ public class ToggleVisualizationAction extends AnAction {
         connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
             @Override
             public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-                //Moving operation to BGT, since PSI reading is costly and shouldn't be done in EDT, which is default here
-                ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                    applyToFile(project, file);
-                });
+                applyToFile(project, file);
             }
         });
     }
@@ -116,15 +109,16 @@ public class ToggleVisualizationAction extends AnAction {
     }
 
     private void applyToFile(Project project, VirtualFile virtualFile) {
-        PsiFile psiFile = ReadAction.compute(() -> PsiManager.getInstance(project).findFile(virtualFile));
-        if (psiFile instanceof PsiJavaFile
-                && psiFile.isValid()) {
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            PsiFile psiFile = ReadAction.compute(() -> PsiManager.getInstance(project).findFile(virtualFile));
 
-            List<Editor> editors = getEditors(project, virtualFile);
+            if (psiFile instanceof PsiJavaFile && psiFile.isValid()) {
+                List<Editor> editors = getEditors(project, virtualFile);
 
-            if (!editors.isEmpty())
-                ReadAction.run(() -> highlightTargetMethod((PsiJavaFile) psiFile, project, editors));
-        }
+                if (!editors.isEmpty())
+                    highlightTargetMethod((PsiJavaFile) psiFile, project, editors);
+            }
+        });
     }
 
     private void unregisterFileOpenListener() {
@@ -151,7 +145,7 @@ public class ToggleVisualizationAction extends AnAction {
             editors.forEach(editor -> editor.getMarkupModel().removeAllHighlighters());
     }
 
-    private static List<Editor> getEditors(Project project, VirtualFile virtualFile) {
+    private List<Editor> getEditors(Project project, VirtualFile virtualFile) {
         // FileEditor instances can be non-textual, so we need to get only the textual ones (Editor)
         return FileEditorManager.getInstance(project).getEditorList(virtualFile)
                 .stream()
@@ -163,20 +157,18 @@ public class ToggleVisualizationAction extends AnAction {
 
     private void highlightTargetMethod(PsiJavaFile psiFile, Project project, List<Editor> editors) {
         final var jfrProcessingService = project.getService(JFRProcessingService.class);
-        if (jfrProcessingService.getProfilingResults() == null)
+        if (jfrProcessingService.isProfilingResultsNotProcessed())
             throw new IllegalStateException("Profiling results are not set");
 
-        List<PsiMethod> psiFileMethods = PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class)
+        List<PsiMethod> psiFileMethods = ReadAction.compute(() -> PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class)
                 .stream()
-                // Filter out methods that are in anonymous classes. Those methods are not being handled yet
-                //.filter(psiMethod -> !(psiMethod.getContainingClass() instanceof PsiAnonymousClass))
-                // Filter out methods that are in classes that are not yet being handled, such as anonymous and local classes
+                // TODO: Filtering out methods that are in classes that are not yet being handled, such as anonymous and local classes
                 .filter(psiMethod -> psiMethod.getContainingClass() != null && psiMethod.getContainingClass().getQualifiedName() != null)
-                .toList();
+                .toList()
+        );
 
         for (PsiMethod method : psiFileMethods) {
             final var methodIdentifier = getMethodIdentifier(method);
-
             final var methodResult = jfrProcessingService.getProfilingResults().get(methodIdentifier);
             if (methodResult != null) {
                 editors.forEach(editor -> highlightMethod(project, method, methodResult, editor));
@@ -185,10 +177,15 @@ public class ToggleVisualizationAction extends AnAction {
     }
 
     private String getMethodIdentifier(PsiMethod method) {
-        final var className = Optional.ofNullable(method.getContainingClass())
-                .map(PsiClass::getQualifiedName)
-                .orElseThrow();
-        return className + "." + method.getName() + ClassUtil.getAsmMethodSignature(method);
+        final var className = ReadAction.compute(() ->
+                Optional.ofNullable(method.getContainingClass())
+                        .map(PsiClass::getQualifiedName)
+                        .orElseThrow()
+        );
+        final var methodName = ReadAction.compute(() -> method.getName());
+        final var methodDescriptor = ReadAction.compute(() -> ClassUtil.getAsmMethodSignature(method));
+
+        return className + "." + methodName + methodDescriptor;
     }
 
     private void highlightMethod(Project project, PsiMethod method, Long methodResult, Editor editor) {
@@ -199,7 +196,9 @@ public class ToggleVisualizationAction extends AnAction {
         int startOffset = method.getTextRange().getStartOffset();
         int endOffset = method.getTextRange().getEndOffset();
 
-        editor.getMarkupModel().addRangeHighlighter(startOffset, endOffset, HighlighterLayer.LAST, attributes, HighlighterTargetArea.EXACT_RANGE);
+        ApplicationManager.getApplication().invokeLater(() -> {
+            editor.getMarkupModel().addRangeHighlighter(startOffset, endOffset, HighlighterLayer.LAST, attributes, HighlighterTargetArea.EXACT_RANGE);
+        });
     }
 
 }
