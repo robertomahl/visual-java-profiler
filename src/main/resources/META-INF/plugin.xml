@@ -16,16 +16,16 @@
             <add-to-group group-id="ToolsMenu" anchor="first"/>
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
 
-            <action id="io.github.robertomahl.visualjavaprofiler.ProfilerLensToggleVisualization"
-                    class="io.github.robertomahl.visualjavaprofiler.action.ToggleVisualizationAction"
-                    text="Toggle Visualization"
-                    description="Enable or disable profiler visualization">
-            </action>
-
             <action id="io.github.robertomahl.visualjavaprofiler.ProfilerLensSelectProfilingResult"
                     class="io.github.robertomahl.visualjavaprofiler.action.SelectProfilingResultAction"
                     text="Select Profiling Result"
                     description="Choose a specific profiling result for analysis">
+            </action>
+
+            <action id="io.github.robertomahl.visualjavaprofiler.ProfilerLensToggleVisualization"
+                    class="io.github.robertomahl.visualjavaprofiler.action.ToggleVisualizationAction"
+                    text="Toggle Visualization"
+                    description="Enable or disable profiler visualization">
             </action>
 
             <action id="io.github.robertomahl.visualjavaprofiler.ProfilerLensSelectMetric"

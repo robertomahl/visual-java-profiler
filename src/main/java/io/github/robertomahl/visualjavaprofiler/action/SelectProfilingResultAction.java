@@ -8,6 +8,9 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -45,26 +48,28 @@ public class SelectProfilingResultAction extends AnAction {
         if (file == null)
             return;
 
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            try {
-                try (RecordingFile recordingFile = new RecordingFile(Path.of(file.getPath()))) {
-                    JFRProcessingService jfrProcessingService = project.getService(JFRProcessingService.class);
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Highlighting Methods", false) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                try {
+                    try (RecordingFile recordingFile = new RecordingFile(Path.of(file.getPath()))) {
+                        JFRProcessingService jfrProcessingService = project.getService(JFRProcessingService.class);
 
-                    //TODO: Perhaps not all the reading has to be wrapped in a read action
-                    ApplicationManager.getApplication().runReadAction(() -> {
-                        jfrProcessingService.read(recordingFile);
-                    });
+                        ApplicationManager.getApplication().runReadAction(() -> {
+                            jfrProcessingService.read(recordingFile);
+                        });
 
+                        ApplicationManager.getApplication().invokeLater(() -> {
+                            ToggleVisualizationAction toggleVisualizationAction = new ToggleVisualizationAction();
+                            toggleVisualizationAction.removeFromAllOpenFiles(project);
+                            toggleVisualizationAction.applyToAllOpenFiles(project);
+                        });
+                    }
+                } catch (IOException ex) {
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        ToggleVisualizationAction toggleVisualizationAction = new ToggleVisualizationAction();
-                        toggleVisualizationAction.removeFromAllOpenFiles(project);
-                        toggleVisualizationAction.applyToAllOpenFiles(project);
+                        Messages.showErrorDialog(project, "Invalid file. Please select a valid JFR file.", "Error");
                     });
                 }
-            } catch (IOException ex) {
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    Messages.showErrorDialog(project, "Invalid file. Please select a valid JFR file.", "Error");
-                });
             }
         });
     }

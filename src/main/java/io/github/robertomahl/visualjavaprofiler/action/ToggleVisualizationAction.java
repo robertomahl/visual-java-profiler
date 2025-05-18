@@ -45,7 +45,6 @@ public class ToggleVisualizationAction extends AnAction {
     //Improvements
     //TODO: add new metrics
     //TODO: indicate whether visualization is active or not
-    //TODO: loading screen
 
     //Extras
     //TODO: also include the actual execution time in a label, besides color highlighting
