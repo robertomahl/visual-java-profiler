@@ -15,12 +15,12 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiAnonymousClass;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.util.ClassUtil;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.messages.MessageBusConnection;
 import io.github.robertomahl.visualjavaprofiler.service.JFRProcessingService;
@@ -175,20 +175,20 @@ public class ToggleVisualizationAction extends AnAction {
                 .toList();
 
         for (PsiMethod method : psiFileMethods) {
-            String methodSignature = getMethodSignature(method);
-            Long methodResult = jfrProcessingService.getProfilingResults().get(methodSignature);
+            final var methodIdentifier = getMethodIdentifier(method);
+
+            final var methodResult = jfrProcessingService.getProfilingResults().get(methodIdentifier);
             if (methodResult != null) {
                 editors.forEach(editor -> highlightMethod(project, method, methodResult, editor));
             }
         }
     }
 
-    private String getMethodSignature(PsiMethod method) {
+    private String getMethodIdentifier(PsiMethod method) {
         final var className = Optional.ofNullable(method.getContainingClass())
                 .map(PsiClass::getQualifiedName)
                 .orElseThrow();
-
-        return className + "." + method.getName();
+        return className + "." + method.getName() + ClassUtil.getAsmMethodSignature(method);
     }
 
     private void highlightMethod(Project project, PsiMethod method, Long methodResult, Editor editor) {

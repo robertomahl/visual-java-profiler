@@ -55,7 +55,7 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
         stackTrace.getFrames().stream()
                 .map(RecordedFrame::getMethod)
                 .filter(method -> isInProjectScope(project, method))
-                .map(this::getMethodSignature)
+                .map(this::getMethodIdentifier)
                 .forEach(methodSignature ->
                         profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
     }
@@ -65,7 +65,7 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
                 .map(RecordedFrame::getMethod)
                 .filter(method -> isInProjectScope(project, method))
                 .findFirst()
-                .map(this::getMethodSignature)
+                .map(this::getMethodIdentifier)
                 .ifPresent(methodSignature ->
                         profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
     }
@@ -93,7 +93,7 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
         return isInProjectScope;
     }
 
-    private String getMethodSignature(RecordedMethod method) {
-        return method.getType().getName() + "." + method.getName();
+    private String getMethodIdentifier(RecordedMethod method) {
+        return method.getType().getName() + "." + method.getName() + method.getDescriptor();
     }
 }
