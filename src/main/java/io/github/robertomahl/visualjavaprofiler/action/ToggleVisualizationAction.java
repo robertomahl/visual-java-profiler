@@ -76,13 +76,22 @@ public class ToggleVisualizationAction extends AnAction {
         final var project = Optional.ofNullable(anActionEvent.getProject()).orElseThrow();
 
         if (isVisible) {
-            unregisterFileOpenListener();
-            removeFromAllOpenFiles(project);
+            stop(project);
         } else {
-            registerFileOpenListener(project);
-            applyToAllOpenFiles(project);
+            start(project);
         }
-        isVisible = !isVisible;
+    }
+
+    public void start(Project project) {
+        unregisterFileOpenListener();
+        removeFromAllOpenFiles(project);
+        isVisible = true;
+    }
+
+    public void stop(Project project) {
+        registerFileOpenListener(project);
+        applyToAllOpenFiles(project);
+        isVisible = false;
     }
 
     private void registerFileOpenListener(Project project) {
@@ -98,7 +107,7 @@ public class ToggleVisualizationAction extends AnAction {
         });
     }
 
-    public void applyToAllOpenFiles(Project project) {
+    private void applyToAllOpenFiles(Project project) {
         FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
 
         VirtualFile[] openFiles = fileEditorManager.getOpenFiles();
@@ -128,7 +137,7 @@ public class ToggleVisualizationAction extends AnAction {
         connection = null;
     }
 
-    public void removeFromAllOpenFiles(Project project) {
+    private void removeFromAllOpenFiles(Project project) {
         FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
 
         VirtualFile[] openFiles = fileEditorManager.getOpenFiles();

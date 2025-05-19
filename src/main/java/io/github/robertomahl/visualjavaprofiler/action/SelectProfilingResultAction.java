@@ -48,7 +48,7 @@ public class SelectProfilingResultAction extends AnAction {
         if (file == null)
             return;
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Highlighting Methods", false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Processing JFR File", false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
@@ -61,8 +61,8 @@ public class SelectProfilingResultAction extends AnAction {
 
                         ApplicationManager.getApplication().invokeLater(() -> {
                             ToggleVisualizationAction toggleVisualizationAction = new ToggleVisualizationAction();
-                            toggleVisualizationAction.removeFromAllOpenFiles(project);
-                            toggleVisualizationAction.applyToAllOpenFiles(project);
+                            toggleVisualizationAction.stop(project);
+                            toggleVisualizationAction.start(project);
                         });
                     }
                 } catch (IOException ex) {

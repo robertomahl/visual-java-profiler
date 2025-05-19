@@ -36,16 +36,6 @@
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="visual-java-profiler" type="f1a62948:ProjectNode" />
               </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="visual-java-profiler" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="visual-java-profiler" type="f1a62948:ProjectNode" />
-                <item name="Run Configurations" type="7b0102dc:RunConfigurationsNode" />
-              </path>
             </expand>
             <select />
           </tree_state>
@@ -300,7 +290,9 @@
       <workItem from="1746895558342" duration="1252000" />
       <workItem from="1747354238659" duration="9302000" />
       <workItem from="1747397854360" duration="602000" />
-      <workItem from="1747491134034" duration="28843000" />
+      <workItem from="1747491134034" duration="29146000" />
+      <workItem from="1747614717003" duration="112000" />
+      <workItem from="1747615940870" duration="1326000" />
     </task>
     <servers />
   </component>
