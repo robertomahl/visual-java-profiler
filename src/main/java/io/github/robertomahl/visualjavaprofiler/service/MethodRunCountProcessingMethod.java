@@ -1,5 +1,6 @@
 package io.github.robertomahl.visualjavaprofiler.service;
 
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -80,10 +81,11 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
         else if (classesNotInProjectScope.contains(method.getType()))
             return false;
 
-        JavaPsiFacade facade = JavaPsiFacade.getInstance(project);
-        GlobalSearchScope scope = ProjectScope.getProjectScope(project);
-
-        final var isInProjectScope = facade.findClass(method.getType().getName(), scope) != null;
+        final var isInProjectScope = ReadAction.compute(() -> {
+            JavaPsiFacade facade = JavaPsiFacade.getInstance(project);
+            GlobalSearchScope scope = ProjectScope.getProjectScope(project);
+            return facade.findClass(method.getType().getName(), scope) != null;
+        });
 
         if (isInProjectScope)
             classesInProjectScope.add(method.getType());

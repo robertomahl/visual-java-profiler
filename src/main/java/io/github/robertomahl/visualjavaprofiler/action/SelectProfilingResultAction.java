@@ -55,9 +55,7 @@ public class SelectProfilingResultAction extends AnAction {
                     try (RecordingFile recordingFile = new RecordingFile(Path.of(file.getPath()))) {
                         JFRProcessingService jfrProcessingService = project.getService(JFRProcessingService.class);
 
-                        ApplicationManager.getApplication().runReadAction(() -> {
-                            jfrProcessingService.read(recordingFile);
-                        });
+                        jfrProcessingService.read(recordingFile);
 
                         ApplicationManager.getApplication().invokeLater(() -> {
                             ToggleVisualizationAction toggleVisualizationAction = new ToggleVisualizationAction();

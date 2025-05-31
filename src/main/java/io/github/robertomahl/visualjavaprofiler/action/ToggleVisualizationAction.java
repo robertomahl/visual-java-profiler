@@ -41,7 +41,6 @@ public class ToggleVisualizationAction extends AnAction {
 
     //Fixes
     //TODO: make sure local, anonymous and lambda classes are handled
-    //TODO: BGT shouldn't hold read locks for a long time because EDT will have to wait for it to finish
 
     //Improvements
     //TODO: add new metrics
