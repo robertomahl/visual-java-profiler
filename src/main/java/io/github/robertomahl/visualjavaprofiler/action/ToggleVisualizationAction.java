@@ -83,14 +83,14 @@ public class ToggleVisualizationAction extends AnAction {
     }
 
     public void start(Project project) {
-        unregisterFileOpenListener();
-        removeFromAllOpenFiles(project);
+        registerFileOpenListener(project);
+        applyToAllOpenFiles(project);
         isVisible = true;
     }
 
     public void stop(Project project) {
-        registerFileOpenListener(project);
-        applyToAllOpenFiles(project);
+        unregisterFileOpenListener();
+        removeFromAllOpenFiles(project);
         isVisible = false;
     }
 
