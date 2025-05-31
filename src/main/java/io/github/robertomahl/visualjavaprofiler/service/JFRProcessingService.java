@@ -12,7 +12,7 @@ public final class JFRProcessingService {
     private ProfilingMetric activeProfilingMetric = ProfilingMetric.METHOD_RUN_COUNT;
 
     private final Project project;
-    private final Map<ProfilingMetric, Map<String, Long>> profilingResultsPerMetric;
+    private final Map<ProfilingMetric, ProcessingMethodResult> profilingResultsPerMetric;
 
     JFRProcessingService(Project project) {
         this.project = project;
@@ -23,7 +23,7 @@ public final class JFRProcessingService {
         return profilingResultsPerMetric.get(activeProfilingMetric) == null;
     }
 
-    public Map<String, Long> getProfilingResults() {
+    public ProcessingMethodResult getProfilingResults() {
         return profilingResultsPerMetric.get(activeProfilingMetric);
     }
 
@@ -37,7 +37,7 @@ public final class JFRProcessingService {
         }
 
         for (ProfilingMetric profilingMetric : ProfilingMetric.values()) {
-            profilingResultsPerMetric.put(profilingMetric, profilingMetric.compute(project, recordingFile).getResultMap());
+            profilingResultsPerMetric.put(profilingMetric, profilingMetric.compute(project, recordingFile));
         }
     }
 }

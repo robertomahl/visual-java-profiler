@@ -14,6 +14,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
@@ -22,8 +23,10 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.util.ClassUtil;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.ui.JBColor;
 import com.intellij.util.messages.MessageBusConnection;
 import io.github.robertomahl.visualjavaprofiler.service.JFRProcessingService;
+import io.github.robertomahl.visualjavaprofiler.service.ProcessingMethodResult;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.List;
@@ -35,22 +38,31 @@ public class ToggleVisualizationAction extends AnAction {
     //Profiler Lens
 
     //Essentials
-    //TODO: implement scale of colors to differ execution time
-    //TODO: add option to only highlight x% most time-consuming methods - configurable
     //TODO: publish the plugin to JetBrains Marketplace
 
     //Fixes
-    //TODO: make sure local, anonymous and lambda classes are handled
+    //TODO: make sure local, anonymous and lambda classes and constructors are handled
 
     //Improvements
     //TODO: add new metrics
     //TODO: indicate whether visualization is active or not
 
     //Extras
+    //TODO: add option to only highlight x% most time-consuming methods - configurable
     //TODO: also include the actual execution time in a label, besides color highlighting
     //TODO: highlight most time-consuming files in the project files view as well
     //TODO: see highlights in the scrollbar
     //TODO: collect user interaction data
+
+    private static final int RED_LIGHT = 255;
+    private static final int GREEN_LIGHT = 165;
+    private static final int BLUE_LIGHT = 0;
+
+    private static final int RED_DARK = 255;
+    private static final int GREEN_DARK = 140;
+    private static final int BLUE_DARK = 0;
+
+    private static final int ALPHA_MAX = 127;
 
     private static boolean isVisible = false;
 
@@ -83,8 +95,10 @@ public class ToggleVisualizationAction extends AnAction {
     }
 
     public void start(Project project) {
-        registerFileOpenListener(project);
-        applyToAllOpenFiles(project);
+        final var profilingResults = getProfilingResults(project);
+
+        registerFileOpenListener(project, profilingResults);
+        applyToAllOpenFiles(project, profilingResults);
         isVisible = true;
     }
 
@@ -94,7 +108,27 @@ public class ToggleVisualizationAction extends AnAction {
         isVisible = false;
     }
 
-    private void registerFileOpenListener(Project project) {
+    private ProcessingMethodResult getProfilingResults(Project project) {
+        final var jfrProcessingService = project.getService(JFRProcessingService.class);
+
+        if (jfrProcessingService.isProfilingResultsNotProcessed())
+            throw new IllegalStateException("Profiling results are not set");
+
+        final var profilingResults = jfrProcessingService.getProfilingResults();
+
+        if (profilingResults.getMaxValue() == 0) {
+            Messages.showWarningDialog(project, "Profiling results have no data. ", "Error");
+            throw new IllegalStateException("Profiling results have no data");
+        }
+        if (profilingResults.getMinValue() == profilingResults.getMaxValue()) {
+            Messages.showWarningDialog(project, "Profiling results have no variation in consumption per method.", "Error");
+            throw new IllegalStateException("Profiling results have no variation in consumption per method");
+        }
+
+        return profilingResults;
+    }
+
+    private void registerFileOpenListener(Project project, ProcessingMethodResult profilingResults) {
         if (connection != null)
             return;
 
@@ -102,21 +136,21 @@ public class ToggleVisualizationAction extends AnAction {
         connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
             @Override
             public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-                applyToFile(project, file);
+                applyToFile(project, file, profilingResults);
             }
         });
     }
 
-    private void applyToAllOpenFiles(Project project) {
+    private void applyToAllOpenFiles(Project project, ProcessingMethodResult profilingResults) {
         FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
 
         VirtualFile[] openFiles = fileEditorManager.getOpenFiles();
         for (VirtualFile virtualFile : openFiles) {
-            applyToFile(project, virtualFile);
+            applyToFile(project, virtualFile, profilingResults);
         }
     }
 
-    private void applyToFile(Project project, VirtualFile virtualFile) {
+    private void applyToFile(Project project, VirtualFile virtualFile, ProcessingMethodResult profilingResults) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             PsiFile psiFile = ReadAction.compute(() -> PsiManager.getInstance(project).findFile(virtualFile));
 
@@ -124,7 +158,7 @@ public class ToggleVisualizationAction extends AnAction {
                 List<Editor> editors = getEditors(project, virtualFile);
 
                 if (!editors.isEmpty())
-                    highlightTargetMethod((PsiJavaFile) psiFile, project, editors);
+                    applyToAllFileMethods((PsiJavaFile) psiFile, project, editors, profilingResults);
             }
         });
     }
@@ -163,11 +197,7 @@ public class ToggleVisualizationAction extends AnAction {
                 .toList();
     }
 
-    private void highlightTargetMethod(PsiJavaFile psiFile, Project project, List<Editor> editors) {
-        final var jfrProcessingService = project.getService(JFRProcessingService.class);
-        if (jfrProcessingService.isProfilingResultsNotProcessed())
-            throw new IllegalStateException("Profiling results are not set");
-
+    private void applyToAllFileMethods(PsiJavaFile psiFile, Project project, List<Editor> editors, ProcessingMethodResult profilingResults) {
         List<PsiMethod> psiFileMethods = ReadAction.compute(() -> PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class)
                 .stream()
                 // TODO: Filtering out methods that are in classes that are not yet being handled, such as anonymous and local classes
@@ -176,11 +206,7 @@ public class ToggleVisualizationAction extends AnAction {
         );
 
         for (PsiMethod method : psiFileMethods) {
-            final var methodIdentifier = getMethodIdentifier(method);
-            final var methodResult = jfrProcessingService.getProfilingResults().get(methodIdentifier);
-            if (methodResult != null) {
-                editors.forEach(editor -> highlightMethod(project, method, methodResult, editor));
-            }
+            editors.forEach(editor -> highlightMethod(project, method, editor, profilingResults));
         }
     }
 
@@ -196,10 +222,13 @@ public class ToggleVisualizationAction extends AnAction {
         return className + "." + methodName + methodDescriptor;
     }
 
-    private void highlightMethod(Project project, PsiMethod method, Long methodResult, Editor editor) {
-        //TODO: add scale of colors
-        //TODO: change to JBColor, with dark respective color
-        TextAttributes attributes = new TextAttributes(null, new Color(255, 165, 0, 100), null, null, Font.PLAIN); // Semi-transparent orange background
+    private void highlightMethod(Project project, PsiMethod method, Editor editor, ProcessingMethodResult profilingResults) {
+        final var methodIdentifier = getMethodIdentifier(method);
+        final var methodResult = profilingResults.getResultMap().get(methodIdentifier);
+        if (methodResult == null)
+            return;
+
+        TextAttributes attributes = getTextAttributes(profilingResults, methodResult);
 
         int startOffset = method.getTextRange().getStartOffset();
         int endOffset = method.getTextRange().getEndOffset();
@@ -207,6 +236,21 @@ public class ToggleVisualizationAction extends AnAction {
         ApplicationManager.getApplication().invokeLater(() -> {
             editor.getMarkupModel().addRangeHighlighter(startOffset, endOffset, HighlighterLayer.LAST, attributes, HighlighterTargetArea.EXACT_RANGE);
         });
+    }
+
+    @SuppressWarnings("UseJBColor")
+    private TextAttributes getTextAttributes(ProcessingMethodResult profilingResults, Long methodResult) {
+        final var minValue = profilingResults.getMinValue();
+        final var maxValue = profilingResults.getMaxValue();
+
+        // Normalizing the method result to a value between 0 and 1
+        double relativePosition = (double) (methodResult - minValue) / (maxValue - minValue);
+
+        int alpha = (int) (relativePosition * ALPHA_MAX);
+        Color lightColor = new Color(RED_LIGHT, GREEN_LIGHT, BLUE_LIGHT, alpha);
+        Color darkColor = new Color(RED_DARK, GREEN_DARK, BLUE_DARK, alpha);
+
+        return new TextAttributes(null, new JBColor(lightColor, darkColor), null, null, Font.PLAIN);
     }
 
 }

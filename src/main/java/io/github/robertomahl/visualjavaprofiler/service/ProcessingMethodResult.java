@@ -5,8 +5,8 @@ import java.util.Map;
 public class ProcessingMethodResult {
 
     private final Map<String, Long> resultMap;
-    private final Long minValue;
-    private final Long maxValue;
+    private final long minValue;
+    private final long maxValue;
 
     public ProcessingMethodResult(Map<String, Long> resultMap) {
         this.resultMap = resultMap;
@@ -30,11 +30,11 @@ public class ProcessingMethodResult {
         return resultMap;
     }
 
-    public Long getMinValue() {
+    public long getMinValue() {
         return minValue;
     }
 
-    public Long getMaxValue() {
+    public long getMaxValue() {
         return maxValue;
     }
 }
