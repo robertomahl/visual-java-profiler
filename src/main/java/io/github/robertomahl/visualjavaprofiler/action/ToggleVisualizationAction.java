@@ -158,7 +158,7 @@ public class ToggleVisualizationAction extends AnAction {
                 List<Editor> editors = getEditors(project, virtualFile);
 
                 if (!editors.isEmpty())
-                    applyToAllFileMethods((PsiJavaFile) psiFile, project, editors, profilingResults);
+                    applyToAllFileMethods((PsiJavaFile) psiFile, editors, profilingResults);
             }
         });
     }
@@ -197,7 +197,7 @@ public class ToggleVisualizationAction extends AnAction {
                 .toList();
     }
 
-    private void applyToAllFileMethods(PsiJavaFile psiFile, Project project, List<Editor> editors, ProcessingMethodResult profilingResults) {
+    private void applyToAllFileMethods(PsiJavaFile psiFile, List<Editor> editors, ProcessingMethodResult profilingResults) {
         List<PsiMethod> psiFileMethods = ReadAction.compute(() -> PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class)
                 .stream()
                 // TODO: Filtering out methods that are in classes that are not yet being handled, such as anonymous and local classes
@@ -206,7 +206,7 @@ public class ToggleVisualizationAction extends AnAction {
         );
 
         for (PsiMethod method : psiFileMethods) {
-            editors.forEach(editor -> highlightMethod(project, method, editor, profilingResults));
+            editors.forEach(editor -> highlightMethod(method, editor, profilingResults));
         }
     }
 
@@ -222,7 +222,7 @@ public class ToggleVisualizationAction extends AnAction {
         return className + "." + methodName + methodDescriptor;
     }
 
-    private void highlightMethod(Project project, PsiMethod method, Editor editor, ProcessingMethodResult profilingResults) {
+    private void highlightMethod(PsiMethod method, Editor editor, ProcessingMethodResult profilingResults) {
         final var methodIdentifier = getMethodIdentifier(method);
         final var methodResult = profilingResults.getResultMap().get(methodIdentifier);
         if (methodResult == null)
