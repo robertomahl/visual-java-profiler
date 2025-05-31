@@ -6,10 +6,13 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import jdk.jfr.consumer.RecordedClass;
 import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedFrame;
@@ -29,17 +32,21 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
 
     @Override
     public ProcessingMethodResult compute(Project project, RecordingFile recordingFile) {
-        Map<String, Long> profilingResults = new HashMap<>();
+        ConcurrentMap<String, Long> profilingResults = new ConcurrentHashMap<>();
+
+        List<RecordedEvent> events = new ArrayList<>();
         while (recordingFile.hasMoreEvents()) {
             try {
                 RecordedEvent event = recordingFile.readEvent();
                 if (EXECUTION_SAMPLE_EVENT.equals(event.getEventType().getName())) {
-                    computeEvent(project, profilingResults, event);
+                    events.add(event);
                 }
             } catch (IOException ex) {
                 throw new RuntimeException("Error reading JFR file", ex);
             }
         }
+        events.parallelStream().forEach(event -> computeEvent(project, profilingResults, event));
+
         return new ProcessingMethodResult(profilingResults);
     }
 
@@ -58,7 +65,7 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
                 .filter(method -> isInProjectScope(project, method))
                 .map(this::getMethodIdentifier)
                 .forEach(methodSignature ->
-                        profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
+                        profilingResults.merge(methodSignature, 1L, Long::sum));
     }
 
     private void flatProfile(Project project, Map<String, Long> profilingResults, RecordedStackTrace stackTrace) {
@@ -68,7 +75,7 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
                 .findFirst()
                 .map(this::getMethodIdentifier)
                 .ifPresent(methodSignature ->
-                        profilingResults.put(methodSignature, profilingResults.getOrDefault(methodSignature, 0L) + 1));
+                        profilingResults.merge(methodSignature, 1L, Long::sum));
     }
 
     private boolean isInProjectScope(Project project, RecordedMethod method) {
