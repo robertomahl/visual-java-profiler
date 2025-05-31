@@ -11,16 +11,19 @@ public class ProcessingMethodResult {
     public ProcessingMethodResult(Map<String, Long> resultMap) {
         this.resultMap = resultMap;
 
-        long min = Long.MAX_VALUE;
-        long max = Long.MIN_VALUE;
-
-        for (Long value : resultMap.values()) {
-            if (value < min) min = value;
-            if (value > max) max = value;
+        if (resultMap.isEmpty()) {
+            this.minValue = 0L;
+            this.maxValue = 0L;
+        } else {
+            long min = Long.MAX_VALUE;
+            long max = Long.MIN_VALUE;
+            for (Long value : resultMap.values()) {
+                if (value < min) min = value;
+                if (value > max) max = value;
+            }
+            this.minValue = min;
+            this.maxValue = max;
         }
-
-        this.minValue = resultMap.isEmpty() ? 0L : min;
-        this.maxValue = resultMap.isEmpty() ? 0L : max;
     }
 
     public Map<String, Long> getResultMap() {
