@@ -111,8 +111,10 @@ public class ToggleVisualizationAction extends AnAction {
     private ProcessingMethodResult getProfilingResults(Project project) {
         final var jfrProcessingService = project.getService(JFRProcessingService.class);
 
-        if (jfrProcessingService.isProfilingResultsNotProcessed())
+        if (jfrProcessingService.isProfilingResultsNotProcessed()) {
+            Messages.showWarningDialog(project, "Could not process results. ", "Error");
             throw new IllegalStateException("Profiling results are not set");
+        }
 
         final var profilingResults = jfrProcessingService.getProfilingResults();
 
