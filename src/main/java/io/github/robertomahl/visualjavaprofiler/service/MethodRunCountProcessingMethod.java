@@ -61,6 +61,7 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
 
     private void inclusiveProfile(Project project, Map<String, Long> profilingResults, RecordedStackTrace stackTrace) {
         stackTrace.getFrames().stream()
+                .filter(RecordedFrame::isJavaFrame)
                 .map(RecordedFrame::getMethod)
                 .filter(this::isNotLambda)
                 .filter(method -> isInProjectScope(project, method))
@@ -71,7 +72,9 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
 
     private void flatProfile(Project project, Map<String, Long> profilingResults, RecordedStackTrace stackTrace) {
         stackTrace.getFrames().stream()
+                .filter(RecordedFrame::isJavaFrame)
                 .map(RecordedFrame::getMethod)
+                //.map(this::print)
                 .filter(this::isNotLambda)
                 .filter(method -> isInProjectScope(project, method))
                 .findFirst()
@@ -80,9 +83,14 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
                         profilingResults.merge(methodSignature, 1L, Long::sum));
     }
 
+//    private RecordedMethod print(RecordedMethod method) {
+//        System.out.println(method.getName() + "\n" + method.getType().getName() + "\n");
+//        return method;
+//    }
+
     private boolean isNotLambda(RecordedMethod method) {
         // Lambdas shall be skipped so their parent method is counted instead
-        return !method.getName().startsWith("lambda$");
+        return !method.getName().startsWith("lambda");
     }
 
     private boolean isInProjectScope(Project project, RecordedMethod method) {
