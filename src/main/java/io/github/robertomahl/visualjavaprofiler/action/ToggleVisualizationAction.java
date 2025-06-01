@@ -64,6 +64,8 @@ public class ToggleVisualizationAction extends AnAction {
 
     private static final int ALPHA_MAX = 127;
 
+    private static final String CONSTRUCTOR_METHOD_NAME = "<init>";
+
     private static boolean isVisible = false;
 
     private static MessageBusConnection connection = null;
@@ -218,7 +220,7 @@ public class ToggleVisualizationAction extends AnAction {
                         .map(PsiClass::getQualifiedName)
                         .orElseThrow()
         );
-        final var methodName = ReadAction.compute(() -> method.getName());
+        final var methodName = ReadAction.compute(() -> method.isConstructor() ? CONSTRUCTOR_METHOD_NAME : method.getName());
         final var methodDescriptor = ReadAction.compute(() -> ClassUtil.getAsmMethodSignature(method));
 
         return className + "." + methodName + methodDescriptor;
