@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
@@ -13,10 +12,10 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
@@ -37,15 +36,11 @@ public class ToggleVisualizationAction extends AnAction {
 
     //Profiler Lens
 
-    //Essentials
-    //TODO: publish the plugin to JetBrains Marketplace
-
-    //Fixes
-    //TODO: make sure local, anonymous and lambda classes and constructors are handled
-
     //Improvements
     //TODO: add new metrics
     //TODO: indicate whether visualization is active or not
+    //TODO: allow selection of a base color
+    //TODO: allow selection of max-intensity of the color (alpha)
 
     //Extras
     //TODO: add option to only highlight x% most time-consuming methods - configurable
@@ -156,13 +151,13 @@ public class ToggleVisualizationAction extends AnAction {
 
     private void applyToFile(Project project, VirtualFile virtualFile, ProcessingMethodResult profilingResults) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            PsiFile psiFile = ReadAction.compute(() -> PsiManager.getInstance(project).findFile(virtualFile));
+            PsiFile psiFile = DumbService.getInstance(project).runReadActionInSmartMode(() -> PsiManager.getInstance(project).findFile(virtualFile));
 
             if (psiFile instanceof PsiJavaFile && psiFile.isValid()) {
                 List<Editor> editors = getEditors(project, virtualFile);
 
                 if (!editors.isEmpty())
-                    applyToAllFileMethods((PsiJavaFile) psiFile, editors, profilingResults);
+                    applyToAllFileMethods(project, (PsiJavaFile) psiFile, editors, profilingResults);
             }
         });
     }
@@ -201,33 +196,20 @@ public class ToggleVisualizationAction extends AnAction {
                 .toList();
     }
 
-    private void applyToAllFileMethods(PsiJavaFile psiFile, List<Editor> editors, ProcessingMethodResult profilingResults) {
-        List<PsiMethod> psiFileMethods = ReadAction.compute(() -> PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class)
-                .stream()
-                // TODO: Filtering out methods that are in classes that are not yet being handled, such as anonymous and local classes
-                .filter(psiMethod -> psiMethod.getContainingClass() != null && psiMethod.getContainingClass().getQualifiedName() != null)
-                .toList()
-        );
+    private void applyToAllFileMethods(Project project, PsiJavaFile psiFile, List<Editor> editors, ProcessingMethodResult profilingResults) {
+        List<PsiMethod> psiFileMethods = (DumbService.getInstance(project).runReadActionInSmartMode(() ->
+                PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class).stream()
+                        .filter(psiMethod -> psiMethod.getContainingClass() != null)
+                        .toList()
+        ));
 
         for (PsiMethod method : psiFileMethods) {
-            editors.forEach(editor -> highlightMethod(method, editor, profilingResults));
+            editors.forEach(editor -> highlightMethod(project, method, editor, profilingResults));
         }
     }
 
-    private String getMethodIdentifier(PsiMethod method) {
-        final var className = ReadAction.compute(() ->
-                Optional.ofNullable(method.getContainingClass())
-                        .map(PsiClass::getQualifiedName)
-                        .orElseThrow()
-        );
-        final var methodName = ReadAction.compute(() -> method.isConstructor() ? CONSTRUCTOR_METHOD_NAME : method.getName());
-        final var methodDescriptor = ReadAction.compute(() -> ClassUtil.getAsmMethodSignature(method));
-
-        return className + "." + methodName + methodDescriptor;
-    }
-
-    private void highlightMethod(PsiMethod method, Editor editor, ProcessingMethodResult profilingResults) {
-        final var methodIdentifier = getMethodIdentifier(method);
+    private void highlightMethod(Project project, PsiMethod method, Editor editor, ProcessingMethodResult profilingResults) {
+        final var methodIdentifier = getMethodIdentifier(project, method);
         final var methodResult = profilingResults.getResultMap().get(methodIdentifier);
         if (methodResult == null)
             return;
@@ -240,6 +222,23 @@ public class ToggleVisualizationAction extends AnAction {
         ApplicationManager.getApplication().invokeLater(() -> {
             editor.getMarkupModel().addRangeHighlighter(startOffset, endOffset, HighlighterLayer.LAST, attributes, HighlighterTargetArea.EXACT_RANGE);
         });
+    }
+
+    private String getMethodIdentifier(Project project, PsiMethod method) {
+        final var className = DumbService.getInstance(project).runReadActionInSmartMode(() ->
+                Optional.ofNullable(method.getContainingClass())
+                        .map(psiClass -> {
+                            StringBuilder stringBuilder = new StringBuilder();
+                            ClassUtil.formatClassName(psiClass, stringBuilder);
+                            return stringBuilder.toString();
+                        })
+                        .orElseThrow()
+        );
+
+        final var methodName = DumbService.getInstance(project).runReadActionInSmartMode(() -> method.isConstructor() ? CONSTRUCTOR_METHOD_NAME : method.getName());
+        final var methodDescriptor = DumbService.getInstance(project).runReadActionInSmartMode(() -> ClassUtil.getAsmMethodSignature(method));
+
+        return className + "." + methodName + methodDescriptor;
     }
 
     @SuppressWarnings("UseJBColor")

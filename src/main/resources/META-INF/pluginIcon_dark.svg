@@ -1,8 +1,8 @@
 <svg width="150" height="150" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
 
   <g id="magnifying-glass">
-    <circle cx="75" cy="75" r="40" stroke="black" stroke-width="8" fill="transparent"/>
-    <rect x="100" y="100" width="40" height="10" transform="rotate(45 100 100)" fill="black"/>
+    <circle cx="75" cy="75" r="40" stroke="white" stroke-width="8" fill="transparent"/>
+    <rect x="100" y="100" width="40" height="10" transform="rotate(45 100 100)" fill="white"/>
     </g>
 
   <g id="chart">

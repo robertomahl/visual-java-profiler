@@ -1,10 +1,11 @@
 package io.github.robertomahl.visualjavaprofiler.service;
 
-import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
+import com.intellij.psi.util.ClassUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import jdk.jfr.consumer.RecordedClass;
 import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedFrame;
 import jdk.jfr.consumer.RecordedMethod;
@@ -24,8 +24,8 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
 
     private static final String EXECUTION_SAMPLE_EVENT = "jdk.ExecutionSample";
 
-    private final Set<RecordedClass> classesInProjectScope = new HashSet<>();
-    private final Set<RecordedClass> classesNotInProjectScope = new HashSet<>();
+    private final Set<String> classesInProjectScope = new HashSet<>();
+    private final Set<String> classesNotInProjectScope = new HashSet<>();
 
     public MethodRunCountProcessingMethod() {
     }
@@ -74,7 +74,6 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
         stackTrace.getFrames().stream()
                 .filter(RecordedFrame::isJavaFrame)
                 .map(RecordedFrame::getMethod)
-                //.map(this::print)
                 .filter(this::isNotLambda)
                 .filter(method -> isInProjectScope(project, method))
                 .findFirst()
@@ -82,11 +81,6 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
                 .ifPresent(methodSignature ->
                         profilingResults.merge(methodSignature, 1L, Long::sum));
     }
-
-//    private RecordedMethod print(RecordedMethod method) {
-//        System.out.println(method.getName() + "\n" + method.getType().getName() + "\n");
-//        return method;
-//    }
 
     private boolean isNotLambda(RecordedMethod method) {
         // Lambdas shall be skipped so their parent method is counted instead
@@ -98,21 +92,22 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
             return false;
         }
 
-        if (classesInProjectScope.contains(method.getType()))
+        if (classesInProjectScope.contains(method.getType().getName()))
             return true;
-        else if (classesNotInProjectScope.contains(method.getType()))
+        else if (classesNotInProjectScope.contains(method.getType().getName()))
             return false;
 
-        final var isInProjectScope = ReadAction.compute(() -> {
-            JavaPsiFacade facade = JavaPsiFacade.getInstance(project);
+        final var isInProjectScope = DumbService.getInstance(project).runReadActionInSmartMode(() -> {
+            PsiManager manager = PsiManager.getInstance(project);
+            String name = method.getType().getName().replace('/', '.');
             GlobalSearchScope scope = ProjectScope.getProjectScope(project);
-            return facade.findClass(method.getType().getName(), scope) != null;
+            return ClassUtil.findPsiClass(manager, name, null, true, scope) != null;
         });
 
         if (isInProjectScope)
-            classesInProjectScope.add(method.getType());
+            classesInProjectScope.add(method.getType().getName());
         else
-            classesNotInProjectScope.add(method.getType());
+            classesNotInProjectScope.add(method.getType().getName());
 
         return isInProjectScope;
     }
