@@ -6,6 +6,7 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.util.ClassUtil;
+import io.github.robertomahl.visualjavaprofiler.exception.InvalidResultException;
 import io.github.robertomahl.visualjavaprofiler.utils.DumbModeUtils;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
                     events.add(event);
                 }
             } catch (IOException ex) {
-                throw new RuntimeException("Error reading JFR file", ex);
+                throw new InvalidResultException("Error reading JFR file");
             }
         }
         events.parallelStream().forEach(event -> computeEvent(project, profilingResults, event));

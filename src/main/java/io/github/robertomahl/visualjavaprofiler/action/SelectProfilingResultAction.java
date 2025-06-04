@@ -16,6 +16,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import io.github.robertomahl.visualjavaprofiler.exception.DumbModeException;
+import io.github.robertomahl.visualjavaprofiler.exception.InvalidResultException;
 import io.github.robertomahl.visualjavaprofiler.service.JFRProcessingService;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -71,8 +72,8 @@ public class SelectProfilingResultAction extends AnAction {
                     ApplicationManager.getApplication().invokeLater(() -> {
                         Messages.showErrorDialog(project, "Invalid file. Please select a valid JFR file.", "Error");
                     });
-                } catch (DumbModeException e) {
-                    System.out.println("Action cannot be performed while the project is indexing.");
+                } catch (DumbModeException | InvalidResultException e) {
+                    System.out.println("Caught exception.");
                 }
             }
         });

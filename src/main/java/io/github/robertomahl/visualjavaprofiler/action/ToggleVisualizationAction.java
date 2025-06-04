@@ -26,6 +26,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.messages.MessageBusConnection;
 import io.github.robertomahl.visualjavaprofiler.exception.DumbModeException;
+import io.github.robertomahl.visualjavaprofiler.exception.InvalidResultException;
 import io.github.robertomahl.visualjavaprofiler.service.JFRProcessingService;
 import io.github.robertomahl.visualjavaprofiler.service.ProcessingMethodResult;
 import io.github.robertomahl.visualjavaprofiler.utils.DumbModeUtils;
@@ -94,8 +95,8 @@ public class ToggleVisualizationAction extends AnAction {
             } else {
                 start(project);
             }
-        } catch (DumbModeException e) {
-            System.out.println("Action cannot be performed while the project is indexing.");
+        } catch (DumbModeException | InvalidResultException e) {
+            System.out.println("Caught exception.");
         }
     }
 
@@ -118,18 +119,18 @@ public class ToggleVisualizationAction extends AnAction {
 
         if (jfrProcessingService.isProfilingResultsNotProcessed()) {
             Messages.showWarningDialog(project, "Could not process results. ", "Error");
-            throw new IllegalStateException("Profiling results are not set");
+            throw new InvalidResultException("Profiling results are not set");
         }
 
         final var profilingResults = jfrProcessingService.getProfilingResults();
 
         if (profilingResults.getMaxValue() == 0) {
             Messages.showWarningDialog(project, "Profiling results have no data. ", "Error");
-            throw new IllegalStateException("Profiling results have no data");
+            throw new InvalidResultException("Profiling results have no data");
         }
         if (profilingResults.getMinValue() == profilingResults.getMaxValue()) {
             Messages.showWarningDialog(project, "Profiling results have no variation in consumption per method.", "Error");
-            throw new IllegalStateException("Profiling results have no variation in consumption per method");
+            throw new InvalidResultException("Profiling results have no variation in consumption per method");
         }
 
         return profilingResults;

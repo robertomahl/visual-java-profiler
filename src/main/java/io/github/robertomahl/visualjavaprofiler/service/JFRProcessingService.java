@@ -32,10 +32,6 @@ public final class JFRProcessingService {
     }
 
     public void read(RecordingFile recordingFile) {
-        if (recordingFile == null) {
-            throw new IllegalArgumentException("RecordingFile cannot be null.");
-        }
-
         for (ProfilingMetric profilingMetric : ProfilingMetric.values()) {
             profilingResultsPerMetric.put(profilingMetric, profilingMetric.compute(project, recordingFile));
         }
