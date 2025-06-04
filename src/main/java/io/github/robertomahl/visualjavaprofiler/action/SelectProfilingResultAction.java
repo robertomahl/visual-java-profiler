@@ -11,9 +11,11 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
+import io.github.robertomahl.visualjavaprofiler.exception.DumbModeException;
 import io.github.robertomahl.visualjavaprofiler.service.JFRProcessingService;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -27,12 +29,14 @@ public class SelectProfilingResultAction extends AnAction {
         Project project = e.getProject();
         Editor editor = e.getData(CommonDataKeys.EDITOR);
 
-        e.getPresentation().setEnabled(project != null && editor != null);
+        e.getPresentation().setEnabled(project != null
+                && editor != null
+                && !DumbService.isDumb(project));
     }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
+        return ActionUpdateThread.EDT;
     }
 
     @Override
@@ -67,6 +71,8 @@ public class SelectProfilingResultAction extends AnAction {
                     ApplicationManager.getApplication().invokeLater(() -> {
                         Messages.showErrorDialog(project, "Invalid file. Please select a valid JFR file.", "Error");
                     });
+                } catch (DumbModeException e) {
+                    System.out.println("Action cannot be performed while the project is indexing.");
                 }
             }
         });

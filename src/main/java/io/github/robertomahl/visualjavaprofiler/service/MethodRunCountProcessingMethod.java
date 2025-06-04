@@ -1,14 +1,14 @@
 package io.github.robertomahl.visualjavaprofiler.service;
 
-import com.intellij.openapi.project.DumbService;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.util.ClassUtil;
+import io.github.robertomahl.visualjavaprofiler.utils.DumbModeUtils;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,8 +24,8 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
 
     private static final String EXECUTION_SAMPLE_EVENT = "jdk.ExecutionSample";
 
-    private final Set<String> classesInProjectScope = new HashSet<>();
-    private final Set<String> classesNotInProjectScope = new HashSet<>();
+    private final Set<String> classesInProjectScope = ConcurrentHashMap.newKeySet();
+    private final Set<String> classesNotInProjectScope = ConcurrentHashMap.newKeySet();
 
     public MethodRunCountProcessingMethod() {
     }
@@ -97,7 +97,8 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
         else if (classesNotInProjectScope.contains(method.getType().getName()))
             return false;
 
-        final var isInProjectScope = DumbService.getInstance(project).runReadActionInSmartMode(() -> {
+        final var isInProjectScope = ReadAction.compute(() -> {
+            DumbModeUtils.assertInSmartMode(project);
             PsiManager manager = PsiManager.getInstance(project);
             String name = method.getType().getName().replace('/', '.');
             GlobalSearchScope scope = ProjectScope.getProjectScope(project);

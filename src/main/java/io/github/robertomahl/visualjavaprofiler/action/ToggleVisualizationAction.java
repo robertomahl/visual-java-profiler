@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
@@ -24,8 +25,10 @@ import com.intellij.psi.util.ClassUtil;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.messages.MessageBusConnection;
+import io.github.robertomahl.visualjavaprofiler.exception.DumbModeException;
 import io.github.robertomahl.visualjavaprofiler.service.JFRProcessingService;
 import io.github.robertomahl.visualjavaprofiler.service.ProcessingMethodResult;
+import io.github.robertomahl.visualjavaprofiler.utils.DumbModeUtils;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.List;
@@ -72,22 +75,27 @@ public class ToggleVisualizationAction extends AnAction {
 
         e.getPresentation().setEnabled(project != null
                 && editor != null
-                && !project.getService(JFRProcessingService.class).isProfilingResultsNotProcessed());
+                && !project.getService(JFRProcessingService.class).isProfilingResultsNotProcessed()
+                && !DumbService.isDumb(project));
     }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
+        return ActionUpdateThread.EDT;
     }
 
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {
         final var project = Optional.ofNullable(anActionEvent.getProject()).orElseThrow();
 
-        if (isVisible) {
-            stop(project);
-        } else {
-            start(project);
+        try {
+            if (isVisible) {
+                stop(project);
+            } else {
+                start(project);
+            }
+        } catch (DumbModeException e) {
+            System.out.println("Action cannot be performed while the project is indexing.");
         }
     }
 
@@ -151,7 +159,10 @@ public class ToggleVisualizationAction extends AnAction {
 
     private void applyToFile(Project project, VirtualFile virtualFile, ProcessingMethodResult profilingResults) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            PsiFile psiFile = DumbService.getInstance(project).runReadActionInSmartMode(() -> PsiManager.getInstance(project).findFile(virtualFile));
+            PsiFile psiFile = ReadAction.compute(() -> {
+                DumbModeUtils.assertInSmartMode(project);
+                return PsiManager.getInstance(project).findFile(virtualFile);
+            });
 
             if (psiFile instanceof PsiJavaFile && psiFile.isValid()) {
                 List<Editor> editors = getEditors(project, virtualFile);
@@ -197,10 +208,12 @@ public class ToggleVisualizationAction extends AnAction {
     }
 
     private void applyToAllFileMethods(Project project, PsiJavaFile psiFile, List<Editor> editors, ProcessingMethodResult profilingResults) {
-        List<PsiMethod> psiFileMethods = (DumbService.getInstance(project).runReadActionInSmartMode(() ->
-                PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class).stream()
-                        .filter(psiMethod -> psiMethod.getContainingClass() != null)
-                        .toList()
+        List<PsiMethod> psiFileMethods = (ReadAction.compute(() -> {
+                    DumbModeUtils.assertInSmartMode(project);
+                    return PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class).stream()
+                            .filter(psiMethod -> psiMethod.getContainingClass() != null)
+                            .toList();
+                }
         ));
 
         for (PsiMethod method : psiFileMethods) {
@@ -225,18 +238,26 @@ public class ToggleVisualizationAction extends AnAction {
     }
 
     private String getMethodIdentifier(Project project, PsiMethod method) {
-        final var className = DumbService.getInstance(project).runReadActionInSmartMode(() ->
-                Optional.ofNullable(method.getContainingClass())
-                        .map(psiClass -> {
-                            StringBuilder stringBuilder = new StringBuilder();
-                            ClassUtil.formatClassName(psiClass, stringBuilder);
-                            return stringBuilder.toString();
-                        })
-                        .orElseThrow()
+        final var className = ReadAction.compute(() -> {
+                    DumbModeUtils.assertInSmartMode(project);
+                    return Optional.ofNullable(method.getContainingClass())
+                            .map(psiClass -> {
+                                StringBuilder stringBuilder = new StringBuilder();
+                                ClassUtil.formatClassName(psiClass, stringBuilder);
+                                return stringBuilder.toString();
+                            })
+                            .orElseThrow();
+                }
         );
 
-        final var methodName = DumbService.getInstance(project).runReadActionInSmartMode(() -> method.isConstructor() ? CONSTRUCTOR_METHOD_NAME : method.getName());
-        final var methodDescriptor = DumbService.getInstance(project).runReadActionInSmartMode(() -> ClassUtil.getAsmMethodSignature(method));
+        final var methodName = ReadAction.compute(() -> {
+            DumbModeUtils.assertInSmartMode(project);
+            return method.isConstructor() ? CONSTRUCTOR_METHOD_NAME : method.getName();
+        });
+        final var methodDescriptor = ReadAction.compute(() -> {
+            DumbModeUtils.assertInSmartMode(project);
+            return ClassUtil.getAsmMethodSignature(method);
+        });
 
         return className + "." + methodName + methodDescriptor;
     }
