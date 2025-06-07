@@ -1,13 +1,13 @@
 package io.github.robertomahl.visualjavaprofiler.service;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.util.ClassUtil;
-import io.github.robertomahl.visualjavaprofiler.exception.InvalidResultException;
-import io.github.robertomahl.visualjavaprofiler.utils.DumbModeUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,10 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
                     events.add(event);
                 }
             } catch (IOException ex) {
-                throw new InvalidResultException("Error reading JFR file");
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    Messages.showErrorDialog(project, "Error reading JFR file.", "Error");
+                });
+                return null;
             }
         }
         events.parallelStream().forEach(event -> computeEvent(project, profilingResults, event));
@@ -98,13 +101,14 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
         else if (classesNotInProjectScope.contains(method.getType().getName()))
             return false;
 
-        final var isInProjectScope = ReadAction.compute(() -> {
-            DumbModeUtils.assertInSmartMode(project);
-            PsiManager manager = PsiManager.getInstance(project);
-            String name = method.getType().getName().replace('/', '.');
-            GlobalSearchScope scope = ProjectScope.getProjectScope(project);
-            return ClassUtil.findPsiClass(manager, name, null, true, scope) != null;
-        });
+        final var isInProjectScope = ReadAction.nonBlocking(() -> {
+                    PsiManager manager = PsiManager.getInstance(project);
+                    String name = method.getType().getName().replace('/', '.');
+                    GlobalSearchScope scope = ProjectScope.getProjectScope(project);
+                    return ClassUtil.findPsiClass(manager, name, null, true, scope) != null;
+                })
+                .inSmartMode(project)
+                .executeSynchronously();
 
         if (isInProjectScope)
             classesInProjectScope.add(method.getType().getName());

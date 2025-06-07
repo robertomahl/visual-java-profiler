@@ -25,11 +25,8 @@ import com.intellij.psi.util.ClassUtil;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.messages.MessageBusConnection;
-import io.github.robertomahl.visualjavaprofiler.exception.DumbModeException;
-import io.github.robertomahl.visualjavaprofiler.exception.InvalidResultException;
 import io.github.robertomahl.visualjavaprofiler.service.JFRProcessingService;
 import io.github.robertomahl.visualjavaprofiler.service.ProcessingMethodResult;
-import io.github.robertomahl.visualjavaprofiler.utils.DumbModeUtils;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.List;
@@ -89,20 +86,18 @@ public class ToggleVisualizationAction extends AnAction {
     public void actionPerformed(AnActionEvent anActionEvent) {
         final var project = Optional.ofNullable(anActionEvent.getProject()).orElseThrow();
 
-        try {
-            if (isVisible) {
-                stop(project);
-            } else {
-                start(project);
-            }
-        } catch (DumbModeException | InvalidResultException e) {
-            System.out.println("Caught exception.");
+        if (isVisible) {
+            stop(project);
+        } else {
+            start(project);
         }
     }
 
     public void start(Project project) {
         final var profilingResults = getProfilingResults(project);
 
+        if (profilingResults == null)
+            return;
         registerFileOpenListener(project, profilingResults);
         applyToAllOpenFiles(project, profilingResults);
         isVisible = true;
@@ -119,18 +114,18 @@ public class ToggleVisualizationAction extends AnAction {
 
         if (jfrProcessingService.isProfilingResultsNotProcessed()) {
             Messages.showWarningDialog(project, "Could not process results. ", "Error");
-            throw new InvalidResultException("Profiling results are not set");
+            return null;
         }
 
         final var profilingResults = jfrProcessingService.getProfilingResults();
 
         if (profilingResults.getMaxValue() == 0) {
-            Messages.showWarningDialog(project, "Profiling results have no data. ", "Error");
-            throw new InvalidResultException("Profiling results have no data");
+            Messages.showWarningDialog(project, "Profiling results have no data for this project. ", "Error");
+            return null;
         }
         if (profilingResults.getMinValue() == profilingResults.getMaxValue()) {
             Messages.showWarningDialog(project, "Profiling results have no variation in consumption per method.", "Error");
-            throw new InvalidResultException("Profiling results have no variation in consumption per method");
+            return null;
         }
 
         return profilingResults;
@@ -160,10 +155,9 @@ public class ToggleVisualizationAction extends AnAction {
 
     private void applyToFile(Project project, VirtualFile virtualFile, ProcessingMethodResult profilingResults) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            PsiFile psiFile = ReadAction.compute(() -> {
-                DumbModeUtils.assertInSmartMode(project);
-                return PsiManager.getInstance(project).findFile(virtualFile);
-            });
+            PsiFile psiFile = ReadAction.nonBlocking(() -> PsiManager.getInstance(project).findFile(virtualFile))
+                    .inSmartMode(project)
+                    .executeSynchronously();
 
             if (psiFile instanceof PsiJavaFile && psiFile.isValid()) {
                 List<Editor> editors = getEditors(project, virtualFile);
@@ -209,13 +203,12 @@ public class ToggleVisualizationAction extends AnAction {
     }
 
     private void applyToAllFileMethods(Project project, PsiJavaFile psiFile, List<Editor> editors, ProcessingMethodResult profilingResults) {
-        List<PsiMethod> psiFileMethods = (ReadAction.compute(() -> {
-                    DumbModeUtils.assertInSmartMode(project);
-                    return PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class).stream()
-                            .filter(psiMethod -> psiMethod.getContainingClass() != null)
-                            .toList();
-                }
-        ));
+        List<PsiMethod> psiFileMethods = ReadAction.nonBlocking(() ->
+                        PsiTreeUtil.findChildrenOfType(psiFile, PsiMethod.class).stream()
+                                .filter(psiMethod -> psiMethod.getContainingClass() != null)
+                                .toList())
+                .inSmartMode(project)
+                .executeSynchronously();
 
         for (PsiMethod method : psiFileMethods) {
             editors.forEach(editor -> highlightMethod(project, method, editor, profilingResults));
@@ -239,26 +232,23 @@ public class ToggleVisualizationAction extends AnAction {
     }
 
     private String getMethodIdentifier(Project project, PsiMethod method) {
-        final var className = ReadAction.compute(() -> {
-                    DumbModeUtils.assertInSmartMode(project);
-                    return Optional.ofNullable(method.getContainingClass())
-                            .map(psiClass -> {
-                                StringBuilder stringBuilder = new StringBuilder();
-                                ClassUtil.formatClassName(psiClass, stringBuilder);
-                                return stringBuilder.toString();
-                            })
-                            .orElseThrow();
-                }
-        );
+        final var className = ReadAction.nonBlocking(() ->
+                        Optional.ofNullable(method.getContainingClass())
+                                .map(psiClass -> {
+                                    StringBuilder stringBuilder = new StringBuilder();
+                                    ClassUtil.formatClassName(psiClass, stringBuilder);
+                                    return stringBuilder.toString();
+                                })
+                                .orElseThrow())
+                .inSmartMode(project)
+                .executeSynchronously();
 
-        final var methodName = ReadAction.compute(() -> {
-            DumbModeUtils.assertInSmartMode(project);
-            return method.isConstructor() ? CONSTRUCTOR_METHOD_NAME : method.getName();
-        });
-        final var methodDescriptor = ReadAction.compute(() -> {
-            DumbModeUtils.assertInSmartMode(project);
-            return ClassUtil.getAsmMethodSignature(method);
-        });
+        final var methodName = ReadAction.nonBlocking(() -> method.isConstructor() ? CONSTRUCTOR_METHOD_NAME : method.getName())
+                .inSmartMode(project)
+                .executeSynchronously();
+        final var methodDescriptor = ReadAction.nonBlocking(() -> ClassUtil.getAsmMethodSignature(method))
+                .inSmartMode(project)
+                .executeSynchronously();
 
         return className + "." + methodName + methodDescriptor;
     }

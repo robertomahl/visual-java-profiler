@@ -8,8 +8,11 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/SelectProfilingResultAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/SelectProfilingResultAction.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/ToggleVisualizationAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/action/ToggleVisualizationAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/exception/DumbModeException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/exception/InvalidResultException.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/service/JFRProcessingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/service/JFRProcessingService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/service/MethodRunCountProcessingMethod.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/service/MethodRunCountProcessingMethod.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/io/github/robertomahl/visualjavaprofiler/utils/DumbModeUtils.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,11 +40,6 @@
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="visual-java-profiler" type="f1a62948:ProjectNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="visual-java-profiler" type="f1a62948:ProjectNode" />
-                <item name="Run Configurations" type="7b0102dc:RunConfigurationsNode" />
               </path>
             </expand>
             <select />
@@ -100,7 +98,7 @@
     "git-widget-placeholder": "main",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/idealogic/IdeaSnapshots/Run_Plugin_2025_06_01_123021.jfr",
+    "last_opened_file_path": "/home/idealogic/IdeaSnapshots/Run_Plugin_2025_05_31_210344.jfr",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -129,7 +127,7 @@
       <recent name="io.github.robertomahl.visualjavaprofiler" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.Run Plugin">
+  <component name="RunManager" selected="Gradle.visual-java-profiler [build]">
     <configuration name="visual-java-profiler [buildDependents]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />

@@ -15,8 +15,6 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
-import io.github.robertomahl.visualjavaprofiler.exception.DumbModeException;
-import io.github.robertomahl.visualjavaprofiler.exception.InvalidResultException;
 import io.github.robertomahl.visualjavaprofiler.service.JFRProcessingService;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -56,24 +54,20 @@ public class SelectProfilingResultAction extends AnAction {
         ProgressManager.getInstance().run(new Task.Backgroundable(project, "Processing JFR File", false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
-                try {
-                    try (RecordingFile recordingFile = new RecordingFile(Path.of(file.getPath()))) {
-                        JFRProcessingService jfrProcessingService = project.getService(JFRProcessingService.class);
+                try (RecordingFile recordingFile = new RecordingFile(Path.of(file.getPath()))) {
+                    JFRProcessingService jfrProcessingService = project.getService(JFRProcessingService.class);
 
-                        jfrProcessingService.read(recordingFile);
+                    jfrProcessingService.read(recordingFile);
 
-                        ApplicationManager.getApplication().invokeLater(() -> {
-                            ToggleVisualizationAction toggleVisualizationAction = new ToggleVisualizationAction();
-                            toggleVisualizationAction.stop(project);
-                            toggleVisualizationAction.start(project);
-                        });
-                    }
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        ToggleVisualizationAction toggleVisualizationAction = new ToggleVisualizationAction();
+                        toggleVisualizationAction.stop(project);
+                        toggleVisualizationAction.start(project);
+                    });
                 } catch (IOException ex) {
                     ApplicationManager.getApplication().invokeLater(() -> {
                         Messages.showErrorDialog(project, "Invalid file. Please select a valid JFR file.", "Error");
                     });
-                } catch (DumbModeException | InvalidResultException e) {
-                    System.out.println("Caught exception.");
                 }
             }
         });

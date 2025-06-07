@@ -33,7 +33,9 @@ public final class JFRProcessingService {
 
     public void read(RecordingFile recordingFile) {
         for (ProfilingMetric profilingMetric : ProfilingMetric.values()) {
-            profilingResultsPerMetric.put(profilingMetric, profilingMetric.compute(project, recordingFile));
+            ProcessingMethodResult result = profilingMetric.compute(project, recordingFile);
+            if (result != null)
+                profilingResultsPerMetric.put(profilingMetric, result);
         }
     }
 }
