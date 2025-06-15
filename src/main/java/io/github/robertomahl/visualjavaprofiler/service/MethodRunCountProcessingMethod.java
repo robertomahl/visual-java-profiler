@@ -82,8 +82,8 @@ public class MethodRunCountProcessingMethod implements ProfilingMetricProcessing
                 .filter(method -> isInProjectScope(project, method))
                 .findFirst()
                 .map(this::getMethodIdentifier)
-                .ifPresent(methodSignature ->
-                        profilingResults.merge(methodSignature, 1L, Long::sum));
+                .ifPresent(methodIdentifier ->
+                        profilingResults.merge(methodIdentifier, 1L, Long::sum));
     }
 
     private boolean isNotLambda(RecordedMethod method) {
