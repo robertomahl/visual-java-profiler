@@ -5,14 +5,14 @@ plugins {
 }
 
 group = "io.github.robertomahl"
-version = "1.0.4"
+version = "1.0.5"
 
 repositories {
     mavenCentral()
 }
 
 intellij {
-    version.set("2024.1.7")
+    version.set("2024.2")
     type.set("IC")
     plugins.set(listOf("com.intellij.java"))
 }

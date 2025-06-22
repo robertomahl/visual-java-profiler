@@ -19,8 +19,8 @@ public final class JFRProcessingService {
         this.profilingResultsPerMetric = new HashMap<>();
     }
 
-    public boolean isProfilingResultsNotProcessed() {
-        return profilingResultsPerMetric.get(activeProfilingMetric) == null;
+    public boolean isProfilingResultsProcessed() {
+        return profilingResultsPerMetric.get(activeProfilingMetric) != null;
     }
 
     public ProcessingMethodResult getProfilingResults() {

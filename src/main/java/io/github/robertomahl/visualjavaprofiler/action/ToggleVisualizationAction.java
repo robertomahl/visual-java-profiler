@@ -73,7 +73,8 @@ public class ToggleVisualizationAction extends AnAction {
 
         e.getPresentation().setEnabled(project != null
                 && editor != null
-                && !project.getService(JFRProcessingService.class).isProfilingResultsNotProcessed()
+                && project.getService(JFRProcessingService.class).isProfilingResultsProcessed()
+                && project.getService(JFRProcessingService.class).getProfilingResults().getMaxValue() > 0
                 && !DumbService.isDumb(project));
     }
 
@@ -112,7 +113,7 @@ public class ToggleVisualizationAction extends AnAction {
     private ProcessingMethodResult getProfilingResults(Project project) {
         final var jfrProcessingService = project.getService(JFRProcessingService.class);
 
-        if (jfrProcessingService.isProfilingResultsNotProcessed()) {
+        if (!jfrProcessingService.isProfilingResultsProcessed()) {
             Messages.showWarningDialog(project, "Could not process results. ", "Error");
             return null;
         }
@@ -121,10 +122,6 @@ public class ToggleVisualizationAction extends AnAction {
 
         if (profilingResults.getMaxValue() == 0) {
             Messages.showWarningDialog(project, "Profiling results have no data for this project. ", "Error");
-            return null;
-        }
-        if (profilingResults.getMinValue() == profilingResults.getMaxValue()) {
-            Messages.showWarningDialog(project, "Profiling results have no variation in consumption per method.", "Error");
             return null;
         }
 
@@ -255,7 +252,7 @@ public class ToggleVisualizationAction extends AnAction {
 
     @SuppressWarnings("UseJBColor")
     private TextAttributes getTextAttributes(ProcessingMethodResult profilingResults, Long methodResult) {
-        final var minValue = profilingResults.getMinValue();
+        final var minValue = profilingResults.getMaxValue();
         final var maxValue = profilingResults.getMaxValue();
 
         // Normalizing the method result to a value between 0 and 1
